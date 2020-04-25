@@ -287,4 +287,3 @@ __pycache__/
 appsettings.Development.json
 .dockerignore
 DockerFile
-Data/Connection/Manejador.cs
