@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "",
+    "appService.defaultWebAppToDeploy": "/subscriptions/eebc00f2-2520-4fee-a653-9ecfafe54762/resourceGroups/prueba/providers/Microsoft.Web/sites/116390867"
+}
