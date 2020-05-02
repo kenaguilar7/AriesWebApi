@@ -19,12 +19,8 @@ namespace AriesWebApi.Controllers {
         private readonly CompañiaCL _companyDao = new CompañiaCL ();
         // GET api/companies
         [HttpGet]
-        public IActionResult Get () {
-
-            return Ok (_companyDao.Get());
-
-        }
-
+        public IActionResult Get () => Ok(_companyDao.Get()); 
+        
         // GET api/companies/5
         [HttpGet ("{id}")]
         public ActionResult<string> Get (int id) {

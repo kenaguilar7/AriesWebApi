@@ -18,7 +18,7 @@ namespace AriesWebApi.Entities.Users
         public string MyMail { get; set; }
         public string MyNotas { get; set; }
         public string MyClave { get; set; }
-        public string MyUpdated { get; set; }
+        public string UpdatedBy { get; set; }
         public bool MyActivo { get; set; }
         //public Boolean MyAdmin { get; set; }
         public DateTime MyFechaCreacion { get; set; }
@@ -27,7 +27,7 @@ namespace AriesWebApi.Entities.Users
 
         public Usuario(string myCedula, string myNombre, string username, TipoUsuario tipoUsuario, string myApellidoPaterno, string myApellidoMaterno,
                        string myTelefono, string myMail, string myNotas, string myClave, bool myActivo,
-                       DateTime myFechaCreacion, DateTime myFechaActualizacion, double myID = 0, string myUpdated = "")
+                       DateTime myFechaCreacion, DateTime myFechaActualizacion, double myID = 0, string updatedBy = "")
         {
             UsuarioId = myID;
             MyCedula = myCedula ?? throw new ArgumentNullException("CEDULA ");
@@ -44,7 +44,7 @@ namespace AriesWebApi.Entities.Users
             MyFechaCreacion = myFechaCreacion;
             MyFechaActualizacion = myFechaActualizacion;
             //MyAdmin = myAdmin;
-            MyUpdated = myUpdated;
+            UpdatedBy = updatedBy;
         }
         public Usuario(string myCedula, string myNombre, string username, TipoUsuario tipoUsuario, string myApellidoPaterno, string myApellidoMaterno,
                    string myTelefono, string myMail, string myNotas, string myClave, bool myActivo, double myID = 0,  string myUpdated = "")
@@ -62,7 +62,7 @@ namespace AriesWebApi.Entities.Users
             MyClave = myClave ?? throw new ArgumentNullException("CLAVE");
             MyActivo = myActivo;
             //MyAdmin = myAdmin;
-            MyUpdated = myUpdated;
+            UpdatedBy = myUpdated;
         }
         public Usuario() { }
         public override string ToString()

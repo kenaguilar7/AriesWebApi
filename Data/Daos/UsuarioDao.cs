@@ -12,49 +12,51 @@ namespace AriesWebApi.Data.Daos
     public class UsuarioDao
     {
         private readonly Manejador manejador = new Manejador();
-        public bool Insert(Usuario t, Usuario user, out string mensaje)
+        public bool Insert(Usuario userInsert)
         {
-            if (!Guachi.Consultar(user, VentanaInfo.FormMaestroUsuario, CRUDName.Insertar))
-            {
-                mensaje = "Acceso denegado!!!";
-                return false;
-            }
-
+            // if (!Guachi.Consultar(userTrigger, VentanaInfo.FormMaestroUsuario, CRUDName.Insertar))
+            // {
+            //     // mensaje = "Acceso denegado!!!";
+            //     return false;
+            // }
+            
+            //Este query debe devolver el id del usuario insertado
             var sql = "INSERT INTO users(number_id,  name,  user_name , user_type , lastname_p , lastname_m,  phone_number , mail , notes,  password,  updated_by,  active) " +
                                  "VALUES(@number_id, @name, @user_name, @user_type, @lastname_p, @lastname_m, @phone_number, @mail, @notes, @password, @updated_by, @active);";
             List<Parametro> lst = new List<Parametro>();
             try
             {
 
-                lst.Add(new Parametro("@number_id", t.MyCedula));
-                lst.Add(new Parametro("@name", t.MyNombre));
-                lst.Add(new Parametro("@user_name", t.UserName));
-                lst.Add(new Parametro("@user_type", (int)t.TipoUsuario));
-                lst.Add(new Parametro("@lastname_p", t.MyApellidoPaterno));
-                lst.Add(new Parametro("@lastname_m", t.MyApellidoMaterno));
-                lst.Add(new Parametro("@phone_number", t.MyTelefono));
-                lst.Add(new Parametro("@mail", t.MyMail));
-                lst.Add(new Parametro("@notes", t.MyNotas));
-                lst.Add(new Parametro("@password", t.MyClave));
-                lst.Add(new Parametro("@updated_by", user.UsuarioId));
-                lst.Add(new Parametro("@active", Convert.ToInt16(t.MyActivo)));
+                lst.Add(new Parametro("@number_id", userInsert.MyCedula));
+                lst.Add(new Parametro("@name", userInsert.MyNombre));
+                lst.Add(new Parametro("@user_name", userInsert.UserName));
+                lst.Add(new Parametro("@user_type", (int)userInsert.TipoUsuario));
+                lst.Add(new Parametro("@lastname_p", userInsert.MyApellidoPaterno));
+                lst.Add(new Parametro("@lastname_m", userInsert.MyApellidoMaterno));
+                lst.Add(new Parametro("@phone_number", userInsert.MyTelefono));
+                lst.Add(new Parametro("@mail", userInsert.MyMail));
+                lst.Add(new Parametro("@notes", userInsert.MyNotas));
+                lst.Add(new Parametro("@password", userInsert.MyClave));
+                lst.Add(new Parametro("@updated_by", userInsert.UpdatedBy));
+                lst.Add(new Parametro("@active", Convert.ToInt16(userInsert.MyActivo)));
 
                 if (manejador.Ejecutar(sql, lst, CommandType.Text) == 0)
                 {
-                    mensaje = "No se guardaron datos";
+                    // mensaje = "No se guardaron datos";
                     return false;
                 }
                 else
                 {
-                    mensaje = "Datos guardados correctamente";
+                    userInsert.UsuarioId = 666; 
+                    // mensaje = "Datos guardados correctamente";
                     return true;
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                mensaje = ex.Message;
-                return false;
+                // mensaje = ex.Message;
+                throw; 
             }
         }
         public Boolean Update(Usuario t, Usuario user, out string mensaje)
@@ -127,7 +129,7 @@ namespace AriesWebApi.Data.Daos
                 "notes, " +              ///9
                 "created_at, " +         ///10
                 "updated_at, " +         ///11
-                "(SELECT user_name FROM users us WHERE us.user_id = updated_by LIMIT 1)," +         ///12
+                "updated_by," +         ///12
                 "active, " +              ///13
                 "password " +             ///14
                 "FROM users";
@@ -152,7 +154,7 @@ namespace AriesWebApi.Data.Daos
                    /* myAdmin: Convert.ToBoolean(vs[10]),            */                      ///"admin, " +              ///10
                     myFechaCreacion: Convert.ToDateTime(vs[10]),                         ///"created_at, " +         ///11
                     myFechaActualizacion: Convert.ToDateTime(Convert.ToString(vs[11])),  ///"updated_at, " +         ///12
-                    myUpdated: Convert.ToString(Convert.ToString(vs[12])),               ///"updated_by ," +         ///13
+                    updatedBy: Convert.ToString(vs[12]),               ///"updated_by ," +         ///13
                     myActivo: Convert.ToBoolean(vs[13]),                                 ///"active, "+              ///14
                     myClave: Convert.ToString(vs[14])                                    ///"password "+             ///15
                                        ));

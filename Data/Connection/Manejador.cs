@@ -15,7 +15,15 @@ namespace AriesWebApi.Data.Connection {
 
         public static string GetConnectionn () {
             
-            return "";
+            var builder = new ConfigurationBuilder()
+              .SetBasePath(Directory.GetCurrentDirectory())
+              .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true); 
+              
+            IConfiguration configuration = builder.Build();
+            
+            var ss =  configuration["ConnectionStrings:MySqlConnection"];
+
+            return ss; 
         }
         public void OpenConnection () {
 
