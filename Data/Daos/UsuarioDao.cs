@@ -59,13 +59,13 @@ namespace AriesWebApi.Data.Daos
                 throw; 
             }
         }
-        public Boolean Update(Usuario t, Usuario user, out string mensaje)
+        public Boolean Update(Usuario user)
         {
-            if (!Guachi.Consultar(user, VentanaInfo.FormMaestroUsuario, CRUDName.Actualizar))
-            {
-                mensaje = "Acceso denegado!!!";
-                return false;
-            }
+            // if (!Guachi.Consultar(user, VentanaInfo.FormMaestroUsuario, CRUDName.Actualizar))
+            // {
+            //     // mensaje = "Acceso denegado!!!";
+            //     return false;
+            // }
 
             try
             {
@@ -73,36 +73,26 @@ namespace AriesWebApi.Data.Daos
                       "mail=@mail,notes=@notes,password=@password,updated_by=@updated_by,active=@active WHERE user_id = @user_id;";
                 List<Parametro> lst = new List<Parametro>();
 
-                lst.Add(new Parametro("@user_id", t.UsuarioId));
-                lst.Add(new Parametro("@number_id", t.MyCedula));
-                lst.Add(new Parametro("@name", t.MyNombre));
-                lst.Add(new Parametro("@user_name", t.UserName));
-                lst.Add(new Parametro("@user_type", (int)t.TipoUsuario));
-                lst.Add(new Parametro("@lastname_p", t.MyApellidoPaterno));
-                lst.Add(new Parametro("@lastname_m", t.MyApellidoMaterno));
-                lst.Add(new Parametro("@phone_number", t.MyTelefono));
-                lst.Add(new Parametro("@mail", t.MyMail));
-                lst.Add(new Parametro("@notes", t.MyNotas));
-                lst.Add(new Parametro("@password", t.MyClave));
-                lst.Add(new Parametro("@updated_by", user.UsuarioId));
-                lst.Add(new Parametro("@active", Convert.ToInt16(t.MyActivo)));
-
-                if (manejador.Ejecutar(sql, lst, CommandType.Text) == 0)
-                {
-                    mensaje = "No se actualizaron datos";
-                    return false;
-                }
-                else
-                {
-                    mensaje = "Datos actualizados correctamente";
-                    return true;
-                }
+                lst.Add(new Parametro("@user_id", user.UsuarioId));
+                lst.Add(new Parametro("@number_id", user.MyCedula));
+                lst.Add(new Parametro("@name", user.MyNombre));
+                lst.Add(new Parametro("@user_name", user.UserName));
+                lst.Add(new Parametro("@user_type", (int)user.TipoUsuario));
+                lst.Add(new Parametro("@lastname_p", user.MyApellidoPaterno));
+                lst.Add(new Parametro("@lastname_m", user.MyApellidoMaterno));
+                lst.Add(new Parametro("@phone_number", user.MyTelefono));
+                lst.Add(new Parametro("@mail", user.MyMail));
+                lst.Add(new Parametro("@notes", user.MyNotas));
+                lst.Add(new Parametro("@password", user.MyClave));
+                lst.Add(new Parametro("@updated_by", user.UpdatedBy));
+                lst.Add(new Parametro("@active", Convert.ToInt16(user.MyActivo)));
+                
+                return (manejador.Ejecutar(sql, lst, CommandType.Text) == 0)? true:false; 
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                mensaje = ex.Message;
-                return false;
+                throw; 
             }
 
         }

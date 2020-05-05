@@ -1,28 +1,29 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AriesWebApi.Entities.Companies;
 using AriesWebApi.Entities.Enums;
 using AriesWebApi.Entities.TransactionsDates;
 
 namespace AriesWebApi.Entities.Entries
 {
-    public class Asiento
+        public class Asiento
     {
-       public Double Id { get; set; }
-        public int NumeroAsiento { get; set; }//cambiar a int 
-        public List<Transaccion> Transaccions { get; set; }
-        public DateTime FechaRegistro { get; set; }//cambiar a mes de registri // YY/MM/DDD
-        public FechaTransaccion FechaAsiento { get; set; }//Quitar
+        public int Id { get; set; }
+        public int NumeroAsiento { get; set; }
+        public List<Transaccion> Transaccions { get; set; } = new List<Transaccion>();
+        public DateTime FechaRegistro { get; set; }
+        public FechaTransaccion FechaAsiento { get; set; }
         public Boolean Convalidado { get; set; }
         public DateTime FechaConvalidacion { get; set; }
-        public Compañia Compania { get; set; }//Quitar
+        public Compañia Compania { get; set; }
         public EstadoAsiento Estado { get; set; }
 
 
         public Asiento(int numeroAsiento, List<Transaccion> transaccions, DateTime fechaRegistro, FechaTransaccion fechaAiento,
-                       Compañia compania, EstadoAsiento estado = EstadoAsiento.Proceso, Double Id = 0)
+                       Compañia compania, EstadoAsiento estado = EstadoAsiento.Proceso, int Id = 0)
         {
-            
+
             this.NumeroAsiento = numeroAsiento;
             this.Transaccions = transaccions;
             this.FechaRegistro = fechaRegistro;
@@ -36,7 +37,6 @@ namespace AriesWebApi.Entities.Entries
         {
             NumeroAsiento = numeroAsiento;
             Compania = compania;
-            this.Transaccions = new List<Transaccion>();
         }
 
         public Asiento()
@@ -47,40 +47,20 @@ namespace AriesWebApi.Entities.Entries
         {
             return Convert.ToString(NumeroAsiento);
         }
-        public double Debitos
+        public decimal DebitosColones
         {
             get
             {
-                var retorno = 0.00;
-
-                foreach (var item in Transaccions)
-                {
-                    if (item.ComportamientoCuenta == Comportamiento.Debito)
-                    {
-                        retorno += item.Monto;
-                    }
-                }
-
-                return retorno;
+                return GetMontoTransaccion(Comportamiento.Debito);
             }
         }
 
-        public double Creditos
+
+        public decimal CreditosColones
         {
             get
             {
-
-                var retorno = 0.00;
-
-                foreach (var item in Transaccions)
-                {
-                    if (item.ComportamientoCuenta == Comportamiento.Credito)
-                    {
-                        retorno += item.Monto;
-                    }
-                }
-
-                return retorno;
+                return GetMontoTransaccion(Comportamiento.Credito);
             }
         }
 
@@ -88,16 +68,13 @@ namespace AriesWebApi.Entities.Entries
         {
             get
             {
-
-                if (Debitos == Creditos)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return (DebitosColones == CreditosColones) ? true : false;
             }
-        }  
+        }
+
+        private decimal GetMontoTransaccion(Comportamiento comportamiento)
+        {
+            return Transaccions.FindAll(x => x.ComportamientoCuenta == comportamiento).Sum(x => x.Monto);
+        }
     }
 }

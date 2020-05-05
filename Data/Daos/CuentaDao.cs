@@ -39,7 +39,7 @@ namespace AriesWebApi.Data.Daos
             mensaje = (result == 1) ? "Cuenta eliminada correctamente" : "No se pudo eliminar la cuenta porque tiene movimientos";
             return (result == 1) ? true : false;
         }
-        public List<Cuenta> GetAll(Compañia t, Usuario user = null)
+        public List<Cuenta> GetAll(string companyid)
         {
             var retorno = new List<Cuenta>();
 
@@ -58,21 +58,21 @@ namespace AriesWebApi.Data.Daos
                 "n.account_name_id LEFT JOIN accounts b ON a.father_account = " +
                 "b.account_id WHERE a.company_id = @company_id AND a.active = 1  ORDER BY a.account_id; ";
 
-            DataTable dt = manejador.Listado(sql, new List<Parametro> { new Parametro("@company_id", t.Codigo) }, CommandType.Text);
+            DataTable dt = manejador.Listado(sql, new List<Parametro> { new Parametro("@company_id", companyid) }, CommandType.Text);
 
 
             foreach (DataRow item in dt.Rows)
             {
                 object[] vs = item.ItemArray;
                 retorno.Add(new Cuenta(
-                       id: Convert.ToDouble(vs[0]),
+                       id: Convert.ToInt32(vs[0]),
                        nombre: Convert.ToString(vs[1]),
-                       padre: Convert.ToDouble(vs[2]),
-                       saldoAnteriorColones: Convert.ToDouble(vs[3]),
-                       saldoAnteriorDolares: Convert.ToDouble(vs[4]),
+                       padre: Convert.ToInt32(vs[2]),
+                       saldoAnteriorColones: Convert.ToDecimal(vs[3]),
+                       saldoAnteriorDolares: Convert.ToDecimal(vs[4]),
                        debitos: 0,
                        creditos: 0,
-                       myCompania: t,
+                       myCompania: null,
                        tipoCuenta: Cuenta.GenerarTipoCuenta(Convert.ToInt32(vs[5])),
                        indicador: (IndicadorCuenta)(Convert.ToInt32(vs[6])),
                        editable: Convert.ToBoolean(vs[7]),
@@ -223,7 +223,7 @@ namespace AriesWebApi.Data.Daos
                             cmd.ExecuteNonQuery();
                         }
 
-                        t.Id = Convert.ToDouble(rer);
+                        t.Id = Convert.ToInt32(rer);
                         tr.Commit();
                         mensaje = "Asiento guardado correctamente";
                         return true;
@@ -411,10 +411,10 @@ namespace AriesWebApi.Data.Daos
                 {
                     if (Cuenta.Id == Convert.ToDouble(vs[0]))
                     {
-                        Cuenta.DebitosColones = Convert.ToDouble(vs[1]);
-                        Cuenta.CreditosColones = Convert.ToDouble(vs[2]);
-                        Cuenta.DebitosDolares = Convert.ToDouble(vs[3]);
-                        Cuenta.CreditosDolares = Convert.ToDouble(vs[4]);
+                        Cuenta.DebitosColones = Convert.ToDecimal(vs[1]);
+                        Cuenta.CreditosColones = Convert.ToDecimal(vs[2]);
+                        Cuenta.DebitosDolares = Convert.ToDecimal(vs[3]);
+                        Cuenta.CreditosDolares = Convert.ToDecimal(vs[4]);
                         Cuenta.Cuadrada = (Convert.ToInt32(vs[5]) == 0) ? false : true;
                         return;
                     }
@@ -462,7 +462,7 @@ namespace AriesWebApi.Data.Daos
             ///Buscamos la lista de sus hijas y le asignamos el padre id con el nuevo valor 
             ///insertamos cuenta por cuenta y hacemos el mismo proceso 
 
-            var cuenntas = GetAll(compañiaModelo, usuario);
+            var cuenntas = GetAll(compañiaModelo.Codigo);
 
             foreach (var cuenta in cuenntas)
             {
@@ -595,7 +595,7 @@ namespace AriesWebApi.Data.Daos
                         {
                             SelectCommand = cmd
                         };
-                        cuenta.Id = Convert.ToDouble(cmd.ExecuteScalar().ToString());
+                        cuenta.Id = Convert.ToInt32(cmd.ExecuteScalar().ToString());
                         tr.Commit();
                         return true;
                     }

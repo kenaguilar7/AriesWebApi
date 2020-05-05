@@ -7,11 +7,11 @@ namespace AriesWebApi.Entities.Accounts
     {
         public TipoCuenta TipoCuenta { get { return TipoCuenta.Egreso; } }
         public Comportamiento Comportamiento { get { return Comportamiento.Debito; } }
-        public double SaldoActual(double saldo, double debito, double credito)
+        public decimal SaldoActual(decimal saldo, decimal debito, decimal credito)
         {
             return (saldo + debito - credito);
         }
-        public double SaldoMensual(double debito, double credito)
+        public decimal SaldoMensual(decimal debito, decimal credito)
         {
             return (credito - debito);
         }

@@ -1,37 +1,68 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AriesWebApi.Entities.Companies;
 using AriesWebApi.Entities.Enums;
 using AriesWebApi.Entities.Interfaces;
+using Newtonsoft.Json;
 
-namespace AriesWebApi.Entities.Accounts
-{
-    public class Cuenta
-    {
-        public string Nombre { get; set; }
+namespace AriesWebApi.Entities.Accounts {
+
+        
+        public class Cuenta {
+        public String Nombre { get; set; }
+        
+        [JsonIgnore]
         public Compañia MyCompania { get; set; } ///Quitar
-        public double Id { get; set; }
-        public double Padre { get; set; }
-        public double SaldoAnteriorColones { get; set; }
-        public double SaldoAnteriorDolares { get; set; }
-        public double DebitosColones { get; set; }
-        public double DebitosDolares { get; set; }
-        public double CreditosColones { get; set; }
-        public double CreditosDolares { get; set; }
-        public string Detalle { get; set; }
-        public bool Active { get; set; }
+        public int Id { get; set; }
+        
+        // [JsonIgnore]
+        public int Padre { get; set; }
+        
+        // [JsonIgnore]
+        public decimal SaldoAnteriorColones { get; set; }
+        
+        // [JsonIgnore]
+        public decimal SaldoAnteriorDolares { get; set; }
+        
+        // [JsonIgnore]
+        public decimal DebitosColones { get; set; }
+        
+        // [JsonIgnore]
+        public decimal DebitosDolares { get; set; }
+        
+        // [JsonIgnore]
+        public decimal CreditosColones { get; set; }
+        
+        // [JsonIgnore]
+        public decimal CreditosDolares { get; set; }
+        
+        // [JsonIgnore]
+        public String Detalle { get; set; }
+        
+        // [JsonIgnore]
+        public Boolean Active { get; set; }
+        
+        // [JsonConverter(typeof(IndicadorCuenta))]
         public IndicadorCuenta Indicador { get; set; }
+        
+        [JsonIgnore]
+        // [JsonConverter(typeof(ITipoCuenta))]
         public ITipoCuenta TipoCuenta { get; set; }
-        public bool Editable { get; set; }
-        public string PathDirection { get; set; }
-        public bool Cuadrada { get; set; }
-        public Cuenta()
-        {
+        
+        // [JsonIgnore]
+        public Boolean Editable { get; set; }
+        
+        // [JsonIgnore]
+        public String PathDirection { get; set; }
+        
+        // [JsonIgnore]
+        public Boolean Cuadrada { get; set; }
+        public Cuenta () {
 
         }
-        public Cuenta(string nombre, Compañia myCompania, ITipoCuenta tipoCuenta, IndicadorCuenta indicador, string detalle,
-                      double padre, double id = 0, double saldoAnteriorColones = 0.0, double saldoAnteriorDolares = 0.00,
-                      double debitos = 0.0, double creditos = 0.0, bool active = true, bool editable = false, bool cuadrada = true)
-        {
+        public Cuenta (string nombre, Compañia myCompania, ITipoCuenta tipoCuenta, IndicadorCuenta indicador, String detalle,
+            int padre, int id = 0, decimal saldoAnteriorColones = 0.0M, decimal saldoAnteriorDolares = 0.00M,
+            decimal debitos = 0.0M, decimal creditos = 0.0M, bool active = true, bool editable = false, bool cuadrada = true) {
             Nombre = nombre;
             MyCompania = myCompania;
             Id = id;
@@ -45,46 +76,54 @@ namespace AriesWebApi.Entities.Accounts
             TipoCuenta = tipoCuenta;
             Indicador = indicador;
             Editable = editable;
-            Cuadrada = cuadrada; 
+            Cuadrada = cuadrada;
         }
-        public Cuenta(string nombre, double id, double padre, IndicadorCuenta indicadorCuenta = IndicadorCuenta.Cuenta_Auxiliar)
-        {
+        public Cuenta (string nombre, int id, int padre, IndicadorCuenta indicadorCuenta = IndicadorCuenta.Cuenta_Auxiliar) {
             Nombre = nombre;
             Id = id;
             Padre = padre;
             Indicador = indicadorCuenta;
         }
-        public double SaldoActualColones
-        {
-            get { return TipoCuenta.SaldoActual(this.SaldoAnteriorColones, this.DebitosColones, this.CreditosColones); }
+        
+        [JsonIgnore]
+        public decimal SaldoActualColones {
+            get { return TipoCuenta.SaldoActual (this.SaldoAnteriorColones, this.DebitosColones, this.CreditosColones); }
         }
-        public double SaldoMensualColones
-        {
-            get { return TipoCuenta.SaldoMensual(this.DebitosColones, this.CreditosColones); }
+        
+        [JsonIgnore]
+        public decimal SaldoMensualColones {
+            get { return TipoCuenta.SaldoMensual (this.DebitosColones, this.CreditosColones); }
         }
-        public double SaldoActualDolares
-        {
-            get { return TipoCuenta.SaldoActual(this.SaldoAnteriorDolares, DebitosDolares, CreditosDolares); }
+        
+        [JsonIgnore]
+        public decimal SaldoActualDolares {
+            get { return TipoCuenta.SaldoActual (this.SaldoAnteriorDolares, DebitosDolares, CreditosDolares); }
         }
-        public double SaldoMensualDolares
-        {
-            get { return TipoCuenta.SaldoMensual(this.DebitosDolares, this.CreditosDolares); }
+        
+        [JsonIgnore]
+        public decimal SaldoMensualDolares {
+            get { return TipoCuenta.SaldoMensual (this.DebitosDolares, this.CreditosDolares); }
         }
-        public override string ToString()
-        {
+        
+        public override string ToString () {
             return Nombre;
         }
-        public static ITipoCuenta GenerarTipoCuenta(int type)
-        {
-            switch (type)
-            {
-                case 1: return new Activo();
-                case 2: return new Pasivo();
-                case 3: return new Patrimonio();
-                case 4: return new Ingreso();
-                case 5: return new CostoVenta();
-                case 6: return new Egreso();
-                default: return null;
+        public static ITipoCuenta GenerarTipoCuenta (int type) {
+            switch (type) {
+                case 1:
+                    return new Activo ();
+                case 2:
+                    return new Pasivo ();
+                case 3:
+                    return new Patrimonio ();
+                case 4:
+                    return new Ingreso ();
+                case 5:
+                    return new CostoVenta ();
+                case 6:
+                    return new Egreso ();
+                default:
+                    return null;
 
             }
         }
@@ -96,147 +135,111 @@ namespace AriesWebApi.Entities.Accounts
         /// </summary>
         /// <param name="tipo"></param>
         /// <returns></returns>
-        public double SaldoAnteriorParaExcel(int tipo)
-        {
+        public decimal SaldoAnteriorParaExcel (Int16 tipo) {
 
-            if (this.TipoCuenta.Comportamiento == (Comportamiento)tipo)
-            {
+            if (this.TipoCuenta.Comportamiento == (Comportamiento) tipo) {
                 return SaldoAnteriorColones;
+            } else {
+                return 0.00m;
             }
-            else
-            {
-                return 0.00;
-            }
-
 
         }
-        public string[] GetNombreParaExcel(List<Cuenta> list)
-        {
+        public String[] GetNombreParaExcel (List<Cuenta> list) {
 
             ///BUscar cuantos padres tiene 
             var dummy = this;
-            var listaRetorno = new List<Cuenta>();
+            var listaRetorno = new List<Cuenta> ();
 
-            while ((dummy = BuscarCuentaPadre(dummy)) != null)
-            {
+            while ((dummy = BuscarCuentaPadre (dummy)) != null) {
 
-                listaRetorno.Add(dummy);
+                listaRetorno.Add (dummy);
             }
 
-            if (listaRetorno.Count == 0)
-            {
-                var retorno = new string[1];
+            if (listaRetorno.Count == 0) {
+                var retorno = new String[1];
                 retorno[0] = this.Nombre;
-                for (int i = 0; i < retorno.Length; i++)
-                {
-                    if (retorno[i] == null)
-                    {
+                for (int i = 0; i < retorno.Length; i++) {
+                    if (retorno[i] == null) {
                         retorno[i] = "";
                     }
                 }
                 return retorno;
-            }
-            else
-            {
-                var retorno = new string[listaRetorno.Count + 1];
+            } else {
+                var retorno = new String[listaRetorno.Count + 1];
 
                 retorno[retorno.Length - 1] = this.Nombre;
-                for (int i = 0; i < retorno.Length; i++)
-                {
-                    if (retorno[i] == null)
-                    {
+                for (int i = 0; i < retorno.Length; i++) {
+                    if (retorno[i] == null) {
                         retorno[i] = "";
                     }
                 }
                 return retorno;
             }
 
-            Cuenta BuscarCuentaPadre(Cuenta cuentaHija)
-            {
-                if (list.Count != 0)
-                {
-                    foreach (Cuenta item in list)
-                    {
-                        if (item.Id == cuentaHija.Padre)
-                        {
+            Cuenta BuscarCuentaPadre (Cuenta cuentaHija) {
+                if (list.Count != 0) {
+                    foreach (Cuenta item in list) {
+                        if (item.Id == cuentaHija.Padre) {
                             return item;
                         }
 
                     }
                     return null;
-                }
-                else
-                {
+                } else {
                     return null;
                 }
             }
         }
-        public string[] GetArrayNameAndKey(List<Cuenta> list)
-        {
+        public String[] GetArrayNameAndKey (List<Cuenta> list) {
 
             ///BUscar cuantos padres tiene 
             var dummy = this;
-            var listaRetorno = new List<Cuenta>();
+            var listaRetorno = new List<Cuenta> ();
 
-            while ((dummy = BuscarCuentaPadre(dummy)) != null)
-            {
+            while ((dummy = BuscarCuentaPadre (dummy)) != null) {
 
-                listaRetorno.Add(dummy);
+                listaRetorno.Add (dummy);
             }
 
-            if (listaRetorno.Count == 0)
-            {
-                var retorno = new string[1];
+            if (listaRetorno.Count == 0) {
+                var retorno = new String[1];
                 retorno[0] = this.Nombre;
-                for (int i = 0; i < retorno.Length; i++)
-                {
-                    if (retorno[i] == null)
-                    {
+                for (int i = 0; i < retorno.Length; i++) {
+                    if (retorno[i] == null) {
                         retorno[i] = "";
                     }
                 }
                 return retorno;
-            }
-            else
-            {
-                var retorno = new string[listaRetorno.Count + 1];
+            } else {
+                var retorno = new String[listaRetorno.Count + 1];
 
                 retorno[retorno.Length - 1] = this.Nombre;
-                for (int i = 0; i < retorno.Length; i++)
-                {
-                    if (retorno[i] == null)
-                    {
+                for (int i = 0; i < retorno.Length; i++) {
+                    if (retorno[i] == null) {
                         retorno[i] = "";
                     }
                 }
                 return retorno;
             }
 
-            Cuenta BuscarCuentaPadre(Cuenta cuentaHija)
-            {
-                if (list.Count != 0)
-                {
-                    foreach (Cuenta item in list)
-                    {
-                        if (item.Id == cuentaHija.Padre)
-                        {
+            Cuenta BuscarCuentaPadre (Cuenta cuentaHija) {
+                if (list.Count != 0) {
+                    foreach (Cuenta item in list) {
+                        if (item.Id == cuentaHija.Padre) {
                             return item;
                         }
 
                     }
                     return null;
-                }
-                else
-                {
+                } else {
                     return null;
                 }
             }
         }
-        public Cuenta DeepCopy()
-        {
-            Cuenta other = (Cuenta)this.MemberwiseClone();
+        public Cuenta DeepCopy () {
+            Cuenta other = (Cuenta) this.MemberwiseClone ();
 
-            other.Nombre = string.Copy(Nombre);
+            other.Nombre = String.Copy (Nombre);
             other.MyCompania = MyCompania;
             other.Id = Id;
             other.Padre = Padre;
@@ -257,17 +260,16 @@ namespace AriesWebApi.Entities.Accounts
         /// ya sea en Debitos, Creditos o saldo actual devolvera true
         /// </summary>
         /// <returns></returns>
-        public bool CuentaConMovientos()
-        {
-            if (SaldoAnteriorColones == 0.00 && DebitosColones == 0.00 && CreditosColones == 0.00)
-            {
+        public Boolean CuentaConMovientos () {
+            if (SaldoAnteriorColones == 0.00m && DebitosColones == 0.00m && CreditosColones == 0.00m) {
                 return false;
-            }
-            else
-            {
+            } else {
                 return true;
             }
 
+        }
+        public bool Validate (IValidator<Cuenta> validator, ref IEnumerable<string> brokenRules) {
+            return validator.IsValid (this, ref brokenRules);
         }
     }
 

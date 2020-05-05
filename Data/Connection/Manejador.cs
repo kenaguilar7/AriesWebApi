@@ -1,29 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
 
 namespace AriesWebApi.Data.Connection {
     public class Manejador {
-
         private MySqlConnection databaseConnection = new MySqlConnection (GetConnectionn ());
         private readonly IConfiguration _configuration;
-
         public static string GetConnectionn () {
-            
-            var builder = new ConfigurationBuilder()
-              .SetBasePath(Directory.GetCurrentDirectory())
-              .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true); 
-              
-            IConfiguration configuration = builder.Build();
-            
-            var ss =  configuration["ConnectionStrings:MySqlConnection"];
 
-            return ss; 
+            var builder = new ConfigurationBuilder ()
+                .SetBasePath (Directory.GetCurrentDirectory ())
+                .AddJsonFile ("appsettings.Development.json", optional : true, reloadOnChange : true);
+            IConfiguration configuration = builder.Build ();
+            return configuration["ConnectionStrings:MySqlConnection"];
         }
         public void OpenConnection () {
 
@@ -40,15 +32,10 @@ namespace AriesWebApi.Data.Connection {
             OpenConnection ();
             return databaseConnection;
         }
-        public Manejador () { }
-        /// <summary>
-        /// metodo para ejecutar sp(insert, delete, ,update)
-        /// </summary>
-        /// <param name="nombreSp"></param>
-        /// <param name="lst"></param>
         public int Ejecutar (string nombreSp, List<Parametro> lst, CommandType type) {
             var retorno = 0;
 
+            //Quitar esta transaccion, creo que aqui no hace nada de sentido
             using (MySqlTransaction tr = GetConnection ().BeginTransaction (IsolationLevel.Serializable)) {
                 try {
                     using (MySqlCommand cmd = new MySqlCommand (nombreSp, databaseConnection, tr)) {
@@ -82,13 +69,6 @@ namespace AriesWebApi.Data.Connection {
             }
             return retorno;
         }
-        /// <summary>
-        /// metodo para Listado o consultas (select)
-        /// </summary>
-        /// <param name="nombreSp"></param>
-        /// <param name="lst"></param>
-        /// <returns>la consulta</returns>
-        #region LISTADOS
         public DataTable Listado (String nombreSp, List<Parametro> lst, CommandType type) {
             DataTable dt = new DataTable ();
             MySqlDataAdapter da;
@@ -109,25 +89,13 @@ namespace AriesWebApi.Data.Connection {
             }
             return dt;
         }
-        /// <summary>
-        /// Usar para obtener listas que no requiera parametros 
-        /// </summary>
-        /// <param name="nombreSp"></param>
-        /// <returns></returns>
         public DataTable Listado (String nombreSp, CommandType type) {
             return Listado (nombreSp, new List<Parametro> (), type);
         }
-        /// <summary>
-        /// Usar para obtener lista que requiere solo de un parametro
-        /// </summary>
-        /// <param name="nombreSp"></param>
-        /// <param name="parametro"></param>
-        /// <returns></returns>
         public DataTable Listado (String nombreSp, Parametro parametro, CommandType type) {
             var par = new List<Parametro> ();
             par.Add (parametro);
             return Listado (nombreSp, par, type);
         }
-        #endregion endlistadosregion
     }
 }

@@ -6,8 +6,8 @@ namespace AriesWebApi.Entities.Interfaces
     {
         TipoCuenta TipoCuenta { get ; }
         Comportamiento Comportamiento { get; }
-        double SaldoActual(double saldo, double debito, double credito);
-        double SaldoMensual(double debito, double credito); 
+        decimal SaldoActual(decimal saldo, decimal debito, decimal credito);
+        decimal SaldoMensual(decimal debito, decimal credito); 
     }
 
 }
