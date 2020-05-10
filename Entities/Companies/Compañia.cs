@@ -1,8 +1,10 @@
 using AriesWebApi.Entities.Enums;
+using Newtonsoft.Json;
 
 namespace AriesWebApi.Entities.Companies
 {
-    public class Compañia
+    [JsonConverter(typeof(CompanyTypeConverter))]
+    public abstract class Compañia
     {
         public string Codigo { get; set; }
         public TipoID TipoId { get; set; }

@@ -73,7 +73,7 @@ namespace AriesWebApi.Data.Daos
                        debitos: 0,
                        creditos: 0,
                        myCompania: null,
-                       tipoCuenta: Cuenta.GenerarTipoCuenta(Convert.ToInt32(vs[5])),
+                       itipoCuenta: Cuenta.GenerarTipoCuenta(Convert.ToInt32(vs[5])),
                        indicador: (IndicadorCuenta)(Convert.ToInt32(vs[6])),
                        editable: Convert.ToBoolean(vs[7]),
                        detalle: Convert.ToString(vs[8]),

@@ -42,20 +42,17 @@ namespace AriesWebApi.Data.Daos
 
                 if (manejador.Ejecutar(sql, lst, CommandType.Text) == 0)
                 {
-                    // mensaje = "No se guardaron datos";
                     return false;
                 }
                 else
                 {
                     userInsert.UsuarioId = 666; 
-                    // mensaje = "Datos guardados correctamente";
                     return true;
                 }
 
             }
             catch (Exception)
             {
-                // mensaje = ex.Message;
                 throw; 
             }
         }

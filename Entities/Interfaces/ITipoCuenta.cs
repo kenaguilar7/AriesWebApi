@@ -4,7 +4,7 @@ namespace AriesWebApi.Entities.Interfaces
 {
     public interface ITipoCuenta
     {
-        TipoCuenta TipoCuenta { get ; }
+        NombreTipoCuenta TipoCuenta { get ; }
         Comportamiento Comportamiento { get; }
         decimal SaldoActual(decimal saldo, decimal debito, decimal credito);
         decimal SaldoMensual(decimal debito, decimal credito); 

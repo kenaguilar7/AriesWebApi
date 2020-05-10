@@ -7,11 +7,10 @@ using Newtonsoft.Json;
 
 namespace AriesWebApi.Entities.Accounts {
 
-        
         public class Cuenta {
         public String Nombre { get; set; }
         
-        [JsonIgnore]
+        // [JsonIgnore]
         public Compañia MyCompania { get; set; } ///Quitar
         public int Id { get; set; }
         
@@ -40,13 +39,14 @@ namespace AriesWebApi.Entities.Accounts {
         public String Detalle { get; set; }
         
         // [JsonIgnore]
-        public Boolean Active { get; set; }
+        public bool Active { get; set; }
         
         // [JsonConverter(typeof(IndicadorCuenta))]
         public IndicadorCuenta Indicador { get; set; }
         
+        public NombreTipoCuenta ETipoCuenta { get { return TipoCuenta.TipoCuenta; } set { TipoCuenta = GenerarTipoCuenta((int)value); } }
+
         [JsonIgnore]
-        // [JsonConverter(typeof(ITipoCuenta))]
         public ITipoCuenta TipoCuenta { get; set; }
         
         // [JsonIgnore]
@@ -56,11 +56,11 @@ namespace AriesWebApi.Entities.Accounts {
         public String PathDirection { get; set; }
         
         // [JsonIgnore]
-        public Boolean Cuadrada { get; set; }
+        public bool Cuadrada { get; set; }
         public Cuenta () {
 
         }
-        public Cuenta (string nombre, Compañia myCompania, ITipoCuenta tipoCuenta, IndicadorCuenta indicador, String detalle,
+        public Cuenta (string nombre, Compañia myCompania, ITipoCuenta itipoCuenta, IndicadorCuenta indicador, String detalle,
             int padre, int id = 0, decimal saldoAnteriorColones = 0.0M, decimal saldoAnteriorDolares = 0.00M,
             decimal debitos = 0.0M, decimal creditos = 0.0M, bool active = true, bool editable = false, bool cuadrada = true) {
             Nombre = nombre;
@@ -73,7 +73,7 @@ namespace AriesWebApi.Entities.Accounts {
             CreditosColones = creditos;
             Detalle = detalle;
             Active = active;
-            TipoCuenta = tipoCuenta;
+            TipoCuenta = itipoCuenta;
             Indicador = indicador;
             Editable = editable;
             Cuadrada = cuadrada;

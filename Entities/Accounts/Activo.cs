@@ -6,7 +6,7 @@ namespace AriesWebApi.Entities.Accounts
         
     public class Activo : ITipoCuenta
     {
-        public TipoCuenta TipoCuenta { get { return TipoCuenta.Activo; } }
+        public NombreTipoCuenta TipoCuenta { get { return NombreTipoCuenta.Activo; } }
         public Comportamiento Comportamiento { get { return Comportamiento.Debito;  } }
 
         public decimal SaldoActual(decimal saldo, decimal debito, decimal credito)

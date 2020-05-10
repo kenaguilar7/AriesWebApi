@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using AriesWebApi.Entities.Companies;
 using AriesWebApi.Entities.Users;
 using AriesWebApi.Logic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 
 namespace AriesWebApi.Controllers {
 
@@ -25,7 +25,7 @@ namespace AriesWebApi.Controllers {
         public IActionResult Get () => Ok (_userCL.GetAll ());
 
         // [Authorize]
-        [HttpGet ("{id}")]
+        [HttpGet ("{id}",Name = "GetUser")]
         public IActionResult Get (int id) {
 
             var user = _userCL.GetAll ().FirstOrDefault (u => u.UsuarioId == id);
@@ -39,13 +39,17 @@ namespace AriesWebApi.Controllers {
         public IActionResult Post ([FromBody] Usuario user) {
 
             //Pendiente poner la ruta de creacion en el
-            _userCL.Insert (user);
-            return CreatedAtRoute (nameof (Get), new { Id = user.UsuarioId }, user);
+            // _userCL.Insert (user);
+            // return NotFound();     
+            return CreatedAtRoute (
+                routeName: "GetUser",
+                routeValues : new { id = user.UsuarioId },
+                value : user);
         }
 
         [HttpPut ("{id}")]
         public IActionResult Update (int id, [FromBody] Usuario user) {
-            
+
             /*Pasar esta verificion a la clase de verificaciones*/
             var userFromDb = _userCL.GetAll ().FirstOrDefault (u => u.UsuarioId == id);
 
@@ -57,7 +61,6 @@ namespace AriesWebApi.Controllers {
             _userCL.Update (user);
             return NoContent ();
         }
-        
 
     }
 }

@@ -5,7 +5,7 @@ namespace AriesWebApi.Entities.Accounts
 {
     public class Ingreso : ITipoCuenta
     {
-        public TipoCuenta TipoCuenta { get { return TipoCuenta.Ingreso; } }
+        public NombreTipoCuenta TipoCuenta { get { return NombreTipoCuenta.Ingreso; } }
         public Comportamiento Comportamiento { get { return Comportamiento.Credito; } }
         public decimal SaldoActual(decimal saldo, decimal debito, decimal credito)
         {

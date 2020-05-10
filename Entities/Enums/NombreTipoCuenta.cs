@@ -1,6 +1,6 @@
 ﻿namespace AriesWebApi.Entities.Enums
 {
-    public enum TipoCuenta
+    public enum NombreTipoCuenta
     {
         Activo = 1,
         Pasivo = 2,
