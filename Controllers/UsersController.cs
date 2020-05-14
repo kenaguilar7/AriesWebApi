@@ -39,7 +39,7 @@ namespace AriesWebApi.Controllers {
         public IActionResult Post ([FromBody] Usuario user) {
 
             //Pendiente poner la ruta de creacion en el
-            // _userCL.Insert (user);
+            _userCL.Insert (user);
             // return NotFound();     
             return CreatedAtRoute (
                 routeName: "GetUser",

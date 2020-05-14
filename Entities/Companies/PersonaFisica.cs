@@ -1,13 +1,11 @@
+using System.Runtime.Serialization;
 using AriesWebApi.Entities.Enums;
 
 namespace AriesWebApi.Entities.Companies
 {
     public class PersonaFisica : Compañia
     {
-        private string apellidoPaterno;
-        private string apellidoMaterno;
-
-
+        public override string tipoCompany {get;set;} = "fisica"; 
         public PersonaFisica()
         {
         }
@@ -16,25 +14,17 @@ namespace AriesWebApi.Entities.Companies
                                 string[] telefono, string web, string correo, string observaciones, string apellidoPaterno, string apellidoMaterno, string codigo = "", bool activo = true) :
                                 base(tipoID, numeroId, nombre, TipoMoneda, direccion, telefono, web, correo, observaciones, codigo, activo)
         {
-            this.apellidoPaterno = apellidoPaterno;
-            this.apellidoMaterno = apellidoMaterno;
+            this.MyApellidoPaterno = apellidoPaterno;
+            this.MyApellidoMaterno = apellidoMaterno;
         }
         public PersonaFisica(string apelledoPaterno, string apellidoMaterno)
         {
-            this.apellidoPaterno = apelledoPaterno;
+            this.MyApellidoPaterno = apelledoPaterno;
             this.MyApellidoMaterno = apellidoMaterno;
         }
 
-        public string MyApellidoPaterno
-        {
-            get { return apellidoPaterno; }
-            set { apellidoPaterno = value; }
-        }
-
-        public string MyApellidoMaterno
-        {
-            get { return apellidoMaterno; }
-            set { apellidoMaterno = value; }
-        }
+        public string MyApellidoPaterno {get;set;}
+        public string MyApellidoMaterno {get;set;}
+        
     }
 }

@@ -44,9 +44,9 @@ namespace AriesWebApi.Entities.Accounts {
         // [JsonConverter(typeof(IndicadorCuenta))]
         public IndicadorCuenta Indicador { get; set; }
         
-        public NombreTipoCuenta ETipoCuenta { get { return TipoCuenta.TipoCuenta; } set { TipoCuenta = GenerarTipoCuenta((int)value); } }
+        // public NombreTipoCuenta ETipoCuenta { get { return TipoCuenta.TipoCuenta; } set { TipoCuenta = GenerarTipoCuenta((int)value); } }
 
-        [JsonIgnore]
+        // [JsonIgnore]
         public ITipoCuenta TipoCuenta { get; set; }
         
         // [JsonIgnore]
