@@ -453,7 +453,7 @@ namespace AriesWebApi.Data.Daos
             }
 
         }
-        public bool CopiarCuentas(Compañia compañiaModelo, Compañia compañiaNueva, Usuario usuario)
+        public bool CopiarCuentas(string copyfromId, Compañia compañiaNueva, Usuario usuario)
         {
 
             ///Empezamos insertando de arriba a abajo 
@@ -462,7 +462,7 @@ namespace AriesWebApi.Data.Daos
             ///Buscamos la lista de sus hijas y le asignamos el padre id con el nuevo valor 
             ///insertamos cuenta por cuenta y hacemos el mismo proceso 
 
-            var cuenntas = GetAll(compañiaModelo.Codigo);
+            var cuenntas = GetAll(copyfromId);
 
             foreach (var cuenta in cuenntas)
             {

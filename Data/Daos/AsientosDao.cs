@@ -77,7 +77,7 @@ namespace AriesWebApi.Data.Daos {
         /// <param name="compania"></param>
         /// <param name="traerInfoCompleta"></param>
         /// <returns></returns>
-        public List<Asiento> GetPorFecha (FechaTransaccion fecha, Compañia compania, Boolean traerInfoCompleta = false) {
+        public List<Asiento> GetPorFecha (string companyid,FechaTransaccion fecha) {
             List<Asiento> retorno = new List<Asiento> ();
 
             var sql = "SELECT AC.accounting_entry_id, AC.entry_id, AC.created_at, AM.month_report, AC.status+0, AC.convalidated_at, AM.closed FROM accounting_months AS AM " +
@@ -88,7 +88,7 @@ namespace AriesWebApi.Data.Daos {
                 new List<Parametro> {
                     new Parametro ("@month_report", fecha.Fecha.Month),
                     new Parametro ("@year_report", fecha.Fecha.Year),
-                    new Parametro ("@company_id", compania.Codigo)
+                    new Parametro ("@company_id", companyid)
                 },
                 CommandType.Text
             );
@@ -103,11 +103,11 @@ namespace AriesWebApi.Data.Daos {
                 asiento.FechaAsiento = new FechaTransaccion (fecha: Convert.ToDateTime (vs[3])); //agregar el resto de parametros
                 //asiento.Convalidado = Convert.ToBoolean();
                 asiento.Estado = (EstadoAsiento) Convert.ToInt32 (vs[4]);
-                asiento.Compania = compania;
+                // asiento.Compania = compania;
                 asiento.FechaAsiento = fecha;
-                if (traerInfoCompleta) {
-                    asiento.Transaccions = new TransaccionDao ().GetCompleto (asiento);
-                }
+                // if (traerInfoCompleta) {
+                //     asiento.Transaccions = new TransaccionDao ().GetCompleto (asiento);
+                // }
                 retorno.Add (asiento);
             }
             return retorno;

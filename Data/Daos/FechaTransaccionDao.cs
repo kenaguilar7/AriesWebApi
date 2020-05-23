@@ -16,13 +16,13 @@ namespace AriesWebApi.Data.Daos
     {
         private readonly Manejador manejador = new Manejador();
 
-        public List<FechaTransaccion> GetAll(Compañia t, Usuario user)
+        public List<FechaTransaccion> GetAll(string companyid)
         {
             try
             {
                 List<FechaTransaccion> retorno = new List<FechaTransaccion>();
                 var sql = "SELECT accounting_months_id, month_report, closed FROM accounting_months WHERE company_id = @company_id AND active = 1 ";
-                DataTable dt = manejador.Listado(sql, new Parametro("@company_id", t.Codigo), CommandType.Text);
+                DataTable dt = manejador.Listado(sql, new Parametro("@company_id", companyid), CommandType.Text);
 
                 foreach (DataRow item in dt.Rows)
                 {
@@ -41,7 +41,7 @@ namespace AriesWebApi.Data.Daos
                 throw;
             }
         }
-        public DataTable GetDataTable(Compañia t, Usuario user)
+        public DataTable GetDataTable(string companyid)
         {
             var sql = "SET lc_time_names = 'es_ES';" +
                       "SELECT DATE_FORMAT(ac.month_report,'%M %Y') AS 'Mes'," +
@@ -51,17 +51,17 @@ namespace AriesWebApi.Data.Daos
                       "(SELECT user_name FROM users us WHERE  us.user_id = ac.updated_by  LIMIT 1) AS 'Usuario' " +
                       "FROM accounting_months ac " +
                       "WHERE ac.company_id = @company_id AND ac.active = 1 ORDER BY ac.month_report DESC";
-            return manejador.Listado(sql, new Parametro("@company_id", t.Codigo), CommandType.Text);
+            return manejador.Listado(sql, new Parametro("@company_id", companyid), CommandType.Text);
 
         }
         public bool Insert(FechaTransaccion t, Compañia compañia, Usuario user, out String mensaje)
         {
 
-            if (!Guachi.Consultar(user, VentanaInfo.FormAdminMeses, CRUDName.Insertar))
-            {
-                mensaje = "Acceso denegado!!!";
-                return false;
-            }
+            // if (!Guachi.Consultar(user, VentanaInfo.FormAdminMeses, CRUDName.Insertar))
+            // {
+            //     mensaje = "Acceso denegado!!!";
+            //     return false;
+            // }
 
             try
             {

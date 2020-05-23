@@ -11,6 +11,7 @@ namespace AriesWebApi.Entities.TransactionsDates
         public DateTime Fecha { get; set; }
         public bool Cerrada { get; set; }
         public List<Asiento> Asientos {get; set; }
+        public FechaTransaccion(){}
         public FechaTransaccion(DateTime fecha, bool cerrada = false, double id = 0)
         {
             Id = id;

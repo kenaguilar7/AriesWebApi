@@ -35,39 +35,32 @@ namespace AriesWebApi.Data.Connection {
         public int Ejecutar (string nombreSp, List<Parametro> lst, CommandType type) {
             var retorno = 0;
 
-            //Quitar esta transaccion, creo que aqui no hace nada de sentido
             using (MySqlTransaction tr = GetConnection ().BeginTransaction (IsolationLevel.Serializable)) {
-                try {
-                    using (MySqlCommand cmd = new MySqlCommand (nombreSp, databaseConnection, tr)) {
-                        cmd.CommandType = type;
 
-                        foreach (var item in lst) {
-                            if (item.myDireccion == ParameterDirection.Input) {
-                                cmd.Parameters.AddWithValue (item.myNombre, item.myValor);
-                            }
-                            if (item.myDireccion == ParameterDirection.Output) {
-                                cmd.Parameters.Add (item.myNombre, item.myTipoDato, item.myTamanyo).Direction = ParameterDirection.Output;
-                            }
+                using (MySqlCommand cmd = new MySqlCommand (nombreSp, databaseConnection, tr)) {
+
+                    cmd.CommandType = type;
+
+                    foreach (var item in lst) {
+                        if (item.myDireccion == ParameterDirection.Input) {
+                            cmd.Parameters.AddWithValue (item.myNombre, item.myValor);
                         }
-
-                        retorno = cmd.ExecuteNonQuery ();
-                        tr.Commit ();
-
-                        for (int i = 0; i < lst.Count; i++) {
-                            if (cmd.Parameters[i].Direction == ParameterDirection.Output) {
-                                lst[i].myValor = cmd.Parameters[i].Value.ToString ();
-                            }
+                        if (item.myDireccion == ParameterDirection.Output) {
+                            cmd.Parameters.Add (item.myNombre, item.myTipoDato, item.myTamanyo).Direction = ParameterDirection.Output;
                         }
                     }
-                } catch (Exception ex) {
-                    tr.Rollback ();
-                    throw ex;
 
-                } finally {
-                    CloseConnection ();
+                    try {
+                        retorno = cmd.ExecuteNonQuery ();
+                        tr.Commit ();
+                    } catch (Exception ex) {
+                        tr.Rollback ();
+                        throw ex;
+                    }
+
+                    return retorno;
                 }
             }
-            return retorno;
         }
         public DataTable Listado (String nombreSp, List<Parametro> lst, CommandType type) {
             DataTable dt = new DataTable ();

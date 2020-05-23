@@ -5,100 +5,25 @@ using AriesWebApi.Entities.Companies;
 using AriesWebApi.Entities.Users;
 using AriesWebApi.Entities.Verifications;
 
-namespace AriesWebApi.Logic
-{
-    public class CompañiaCL
-    {
-        private readonly CompañiaDao compañiaDao = new CompañiaDao();
-        /// <summary>
-        /// Se inserta la compañia en la base de datos
-        /// </summary>
-        /// <param name="t"></param>
-        /// <param name="user"></param>
-        /// <returns></returns>
+namespace AriesWebApi.Logic {
+    public class CompañiaCL {
+        private readonly CompañiaDao _companyDao = new CompañiaDao ();
 
-        public IEnumerable<Compañia> Get(){
-            var user = new Usuario(){
-                UsuarioId=1
-            }; 
-            return compañiaDao.GetAll(user); 
+        public IEnumerable<Compañia> Get () {
+            var user = new Usuario () {
+                UsuarioId = 1
+            };
+            return _companyDao.GetAll (user);
         }
-        public Boolean Insert(Compañia t, Usuario user, Compañia copiarDe, out String mensaje)
-        {
+        public Compañia Insert (Compañia company, Usuario user, string copyDataFrom) => _companyDao.Insert (company, copyDataFrom, user);
 
-            try
-            {
+        public void Update (Compañia company, Usuario user) {
 
-                ///Mandemos estas verificaciones a la capa entida
-                if (!VerificaString.VerificarID(t.NumeroCedula, t.TipoId, out mensaje))
-                {
-                    return false;
-                }
-                if (!VerificaString.IsNullOrWhiteSpace(t.Nombre, "Nombre", out mensaje))
-                {
-                    return false;
-                }
-                if (!VerificaString.ValidarEmail(t.Correo))
-                {
-                    mensaje = "Formato de correo invalido";
-                    return false;
-                }
-
-                if (compañiaDao.Insert(t, user, copiarDe, out mensaje))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                mensaje = ex.Message;
-                return false;
-            }
+            _companyDao.Update (company, user);
 
         }
-        public Boolean Update(Compañia t, Usuario user, out String mensaje)
-        {
-            try
-            {
-                if (!VerificaString.VerificarID(t.NumeroCedula, t.TipoId, out mensaje))
-                {
-                    return false;
-                }
-                if (!VerificaString.IsNullOrWhiteSpace(t.Nombre, "Nombre", out mensaje))
-                {
-                    return false;
-                }
-                if (!VerificaString.ValidarEmail(t.Correo))
-                {
-                    mensaje = "Formato de correo invalido";
-                    return false;
-                }
-
-                if (compañiaDao.Update(t, user, out mensaje))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                mensaje = ex.Message;
-                return false;
-            }
-
-
-            
-        }
-        public string NuevoCodigo()
-        {
-            return compañiaDao.NuevoCodigo();
+        public string NuevoCodigo () {
+            return _companyDao.NuevoCodigo ();
         }
         /// <summary>
         /// Devuleve la lista con todas las compañias, Esta lista trae en 
@@ -106,9 +31,8 @@ namespace AriesWebApi.Logic
         /// puede ordenarlas. 
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Compañia> GetAll(Usuario usuario)
-        {
-            return compañiaDao.GetAll(usuario);
+        public IEnumerable<Compañia> GetAll (Usuario usuario) {
+            return _companyDao.GetAll (usuario);
         }
     }
 }

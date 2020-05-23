@@ -16,7 +16,7 @@ namespace AriesWebApi.Controllers {
     [Route ("api/[controller]")]
     [ApiController]
     [Produces ("application/json")]
-    public class UsersController : AuthControllerBase {
+    public class UsersController : ControllerBase {
 
         private readonly UserCL _userCL = new UserCL ();
 
@@ -37,7 +37,6 @@ namespace AriesWebApi.Controllers {
 
         [HttpPost]
         public IActionResult Post ([FromBody] Usuario user) {
-
             //Pendiente poner la ruta de creacion en el
             _userCL.Insert (user);
             // return NotFound();     
@@ -59,7 +58,7 @@ namespace AriesWebApi.Controllers {
             //Hacer una verificacion aqui, en estos momentos este metodo devulve siempre nocontent 
             //cosa que no es correcta
             _userCL.Update (user);
-            return NoContent ();
+            return Ok ();
         }
 
     }

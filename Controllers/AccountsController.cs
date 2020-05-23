@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using AriesWebApi.Entities.Accounts;
 using AriesWebApi.Entities.Companies;
 using AriesWebApi.Entities.Users;
 using AriesWebApi.Logic;
@@ -21,7 +22,24 @@ namespace AriesWebApi.Controllers {
         public IActionResult Get (string companyid) => Ok (_cuentaCL.GetAll (companyid));
         // => Ok (_cuentaCL.GetAll (companyid).Select(x=> new {id = x.Id, nombre = x.Nombre}));
 
+        [HttpPost]
+        public IActionResult Post ([FromBody] Cuenta cuenta) {
+            // Todo Save
+            return CreatedAtRoute (
+                routeName: "Get",
+                routeValues : new { id = cuenta.Id },
+                value : cuenta
+            );
+        }
 
+        [HttpPut]
+        public IActionResult Put ([FromBody] Cuenta cuenta) {
+            return Ok ();
+        }
+        [HttpDelete]
+        public IActionResult Delete([FromBody] Cuenta cuenta){
+            return Ok(); 
+        }
 
     }
 }
