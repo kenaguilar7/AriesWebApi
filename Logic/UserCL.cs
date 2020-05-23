@@ -7,7 +7,7 @@ namespace AriesWebApi.Logic {
     public class UserCL {
         private readonly UsuarioDao _userDao = new UsuarioDao ();
         public List<Usuario> GetAll () => _userDao.GetAll ();
-        public bool Insert (Usuario user) =>  _userDao.Insert (user); 
+        public Usuario Insert (Usuario user) =>  _userDao.Insert (user); 
         public Boolean Update (Usuario user) => _userDao.Update (user);
 
     }

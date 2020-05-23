@@ -25,7 +25,7 @@ namespace AriesWebApi.Controllers {
         public IActionResult Get () => Ok (_userCL.GetAll ());
 
         // [Authorize]
-        [HttpGet ("{id}",Name = "GetUser")]
+        [HttpGet ("{id}", Name = "GetUser")]
         public IActionResult Get (int id) {
 
             var user = _userCL.GetAll ().FirstOrDefault (u => u.UsuarioId == id);
@@ -37,27 +37,31 @@ namespace AriesWebApi.Controllers {
 
         [HttpPost]
         public IActionResult Post ([FromBody] Usuario user) {
-            //Pendiente poner la ruta de creacion en el
-            _userCL.Insert (user);
-            // return NotFound();     
-            return CreatedAtRoute (
-                routeName: "GetUser",
-                routeValues : new { id = user.UsuarioId },
-                value : user);
+
+            try {
+
+                var newuser = _userCL.Insert (user);
+
+                return CreatedAtRoute (
+                    routeName: "GetUser",
+                    routeValues : new { id = newuser.UsuarioId },
+                    value : newuser);
+
+            } catch (System.Exception) {
+
+                throw;
+            }
         }
 
         [HttpPut ("{id}")]
         public IActionResult Update (int id, [FromBody] Usuario user) {
-
-            /*Pasar esta verificion a la clase de verificaciones*/
+            
             var userFromDb = _userCL.GetAll ().FirstOrDefault (u => u.UsuarioId == id);
 
             if (userFromDb == null) {
                 return NotFound ();
-            }
-            //Hacer una verificacion aqui, en estos momentos este metodo devulve siempre nocontent 
-            //cosa que no es correcta
-            _userCL.Update (user);
+            } else
+                _userCL.Update (user);
             return Ok ();
         }
 

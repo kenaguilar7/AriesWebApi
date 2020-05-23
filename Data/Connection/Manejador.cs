@@ -33,7 +33,6 @@ namespace AriesWebApi.Data.Connection {
             return databaseConnection;
         }
         public int Ejecutar (string nombreSp, List<Parametro> lst, CommandType type) {
-            var retorno = 0;
 
             using (MySqlTransaction tr = GetConnection ().BeginTransaction (IsolationLevel.Serializable)) {
 
@@ -42,6 +41,7 @@ namespace AriesWebApi.Data.Connection {
                     cmd.CommandType = type;
 
                     foreach (var item in lst) {
+
                         if (item.myDireccion == ParameterDirection.Input) {
                             cmd.Parameters.AddWithValue (item.myNombre, item.myValor);
                         }
@@ -51,14 +51,43 @@ namespace AriesWebApi.Data.Connection {
                     }
 
                     try {
-                        retorno = cmd.ExecuteNonQuery ();
+                        var retorno = cmd.ExecuteNonQuery ();
                         tr.Commit ();
+                        return retorno;
                     } catch (Exception ex) {
                         tr.Rollback ();
                         throw ex;
                     }
+                }
+            }
+        }
+        public long ExecuteAndReturnLastInsertId (string nombreSp, List<Parametro> lst, CommandType type) {
 
-                    return retorno;
+            using (MySqlTransaction tr = GetConnection ().BeginTransaction (IsolationLevel.Serializable)) {
+
+                using (MySqlCommand cmd = new MySqlCommand (nombreSp, databaseConnection, tr)) {
+
+                    cmd.CommandType = type;
+
+                    foreach (var item in lst) {
+
+                        if (item.myDireccion == ParameterDirection.Input) {
+                            cmd.Parameters.AddWithValue (item.myNombre, item.myValor);
+                        }
+                        if (item.myDireccion == ParameterDirection.Output) {
+                            cmd.Parameters.Add (item.myNombre, item.myTipoDato, item.myTamanyo).Direction = ParameterDirection.Output;
+                        }
+                    }
+
+                    try {
+                        cmd.ExecuteNonQuery();
+                        var retorno = cmd.LastInsertedId; 
+                        tr.Commit ();
+                        return retorno;
+                    } catch (Exception ex) {
+                        tr.Rollback ();
+                        throw ex;
+                    }
                 }
             }
         }
