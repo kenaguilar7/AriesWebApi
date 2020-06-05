@@ -112,10 +112,6 @@ namespace AriesWebApi.Data.Daos {
         }
         public Compañia Insert (Compañia company, string copiarMaestroCuenta, Usuario user) {
 
-            if (!Guachi.Consultar (user, VentanaInfo.FormMaestroCompanias, CRUDName.Insertar)) {
-                throw new AuthenticationException ();
-            }
-
             var sql = "INSERT INTO companies(company_id,type_id,number_id,name,money_type,op1,op2,address,website,mail,phone_number1,phone_number2,notes,user_id)" +
                 "VALUES(@company_id,@type_id,@number_id,@name,@money_type,@op1,@op2,@address,@website,@mail,@phone_number1,@phone_number2,@notes,@user_id);";
             List<Parametro> lst = new List<Parametro> ();
@@ -221,10 +217,6 @@ namespace AriesWebApi.Data.Daos {
 
         }
         public void Update (Compañia compania, Usuario user) {
-
-            if (!Guachi.Consultar (user, VentanaInfo.FormMaestroCompanias, CRUDName.Actualizar)) {
-                throw new AuthenticationException ();
-            }
 
             var message = compania.Nombre + " ACTUAIZADA CORRECTAMENTE";
             var sql = "UPDATE companies SET " +

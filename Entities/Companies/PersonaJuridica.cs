@@ -1,28 +1,23 @@
 using System.Runtime.Serialization;
 using AriesWebApi.Entities.Enums;
 
-namespace AriesWebApi.Entities.Companies
-{
-    
-    public class PersonaJuridica : Compañia
-    {
+namespace AriesWebApi.Entities.Companies {
 
-        public override string tipoCompany {get;set;} = "juridica"; 
-        public PersonaJuridica()
-        {
-        }
+    public class PersonaJuridica : Compañia {
 
-        public PersonaJuridica(TipoID tipoID, string numeroId, string nombre, TipoMonedaCompañia TipoMoneda, string direccion,
-                                  string[] telefono, string web, string correo, string observaciones,
-                                  string representanteLegal, string IDRepresentante, string codigo = "", bool activo = true) :
-                                  base(tipoID, numeroId, nombre, TipoMoneda, direccion, telefono, web, correo, observaciones,codigo, activo)
-        {
-            this.MyRepresentanteLegal = representanteLegal;
-            this.MyIDRepresentanteLegal = IDRepresentante;
-        }
+        public override string _tipoCompany { get; set; } = "juridica";
+        public PersonaJuridica () { }
 
-        public string MyRepresentanteLegal {get;set;}
-        public string MyIDRepresentanteLegal {get;set;}
-        
+        public PersonaJuridica (TipoID tipoID, string numeroId, string nombre, TipoMonedaCompañia TipoMoneda, string direccion,
+                string[] telefono, string web, string correo, string observaciones,
+                string representanteLegal, string IDRepresentante, string codigo = "", bool activo = true):
+            base (tipoID, numeroId, nombre, TipoMoneda, direccion, telefono, web, correo, observaciones, codigo, activo) {
+                this.MyRepresentanteLegal = representanteLegal;
+                this.MyIDRepresentanteLegal = IDRepresentante;
+            }
+
+        public string MyRepresentanteLegal { get; set; }
+        public string MyIDRepresentanteLegal { get; set; }
+
     }
 }

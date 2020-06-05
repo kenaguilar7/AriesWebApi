@@ -35,6 +35,8 @@ namespace AriesWebApi {
             app.UseEndpoints (endpoints => {
                 endpoints.MapControllerRoute ("default", "{controller=Home}/{action=Index}");
                 endpoints.MapControllerRoute ("general", "company/{companyid}/{controller=Home}/{action=Index}");
+                endpoints.MapControllerRoute ("entries", "company/{companyid}/accountingperiod/{accountingperiodid}/{controller=Home}/{action=Index}");
+                endpoints.MapControllerRoute ("transactions", "bookentry/{bookentryid}/{controller=Home}/{action=Index}");
             });
 
         }

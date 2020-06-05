@@ -1,21 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Mime;
-using System.Threading.Tasks;
 using AriesWebApi.Entities.Companies;
 using AriesWebApi.Entities.Users;
 using AriesWebApi.Logic;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AriesWebApi.Controllers {
 
-    [Route ("api/[controller]")]
+    [Route ("api/companies")]
     [ApiController]
     [Produces ("application/json")]
-    public class CompaniesController : AuthControllerBase {
+    public class CompaniesController : ControllerBase {
         private readonly CompañiaCL _companyDao = new CompañiaCL ();
 
         [HttpGet]
@@ -36,13 +31,13 @@ namespace AriesWebApi.Controllers {
         [HttpGet ("GetNewCode")]
         public IActionResult GetNewCode () => Ok (_companyDao.NuevoCodigo ());
 
-        [HttpPost]
+        [HttpPost (Name = "Post")]
         public IActionResult Post ([FromBody] Compañia company) {
 
             var idcopyfrom = Request.Headers["copyfromid"].FirstOrDefault ();
-
+            Usuario user = new Usuario (){UsuarioId=1};
             try {
-                company = _companyDao.Insert (company, null, idcopyfrom);
+                company = _companyDao.Insert (company, user, idcopyfrom);
             } catch (Exception ex) {
                 return BadRequest (ex);
             }
@@ -53,10 +48,10 @@ namespace AriesWebApi.Controllers {
                 value : company);
         }
 
-        [HttpPut ("{id}")]
-        public IActionResult Put (long id, [FromBody] Compañia compania) {
+        [HttpPut (Name = "put")]
+        public IActionResult Put ([FromBody] Compañia compania) {
 
-            Usuario user = new Usuario ();
+            Usuario user = new Usuario (){UsuarioId=1};
 
             try {
                 _companyDao.Update (compania, user);

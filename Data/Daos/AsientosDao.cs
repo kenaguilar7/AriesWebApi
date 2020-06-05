@@ -13,56 +13,46 @@ using MySql.Data.MySqlClient;
 namespace AriesWebApi.Data.Daos {
     public class AsientosDao {
         Manejador manejador = new Manejador ();
-        public bool Delete (Asiento t, Usuario user, out String mensaje) {
-            try {
-                if (!Guachi.Consultar (user, VentanaInfo.FormAsientos, CRUDName.Eliminar)) {
-                    mensaje = "Acceso denegado!!!";
-                    return false;
-                }
+        public void Delete (double accountingEntryId) {
+
 
                 var sql = "UPDATE accounting_entries SET active = FALSE " +
                     "WHERE accounting_entry_id = @accounting_entry_id LIMIT 1";
 
+            try {
                 //int totalActulizados; 
-                var cnt = manejador.Ejecutar (sql, new List<Parametro> { new Parametro ("@accounting_entry_id", t.Id) }, CommandType.Text);
-
-                mensaje = $"Se actualizaron {cnt} asientos";
-                return true;
+                var cnt = manejador.Ejecutar (sql, new List<Parametro> { new Parametro ("@accounting_entry_id", accountingEntryId) }, CommandType.Text);
             } catch (Exception ex) {
-                mensaje = ex.Message;
-                return false;
+                ///log.write(ex); 
+                throw new Exception($"No se pudo ejecutar el metodo {nameof(Delete)}"); 
             }
         }
-        public Asiento Insert (Asiento t, Usuario user, out String mensaje) {
-            if (!Guachi.Consultar (user, VentanaInfo.FormAsientos, CRUDName.Insertar)) {
-                mensaje = "Acceso denegado!!!";
-                return t;
-            }
+        public Asiento Insert (string companyid, double accountingperiodid, int userId, Asiento asiento) {
 
-            var numeroAsiento = GetConsecutivo (t.Compania, t.FechaAsiento.Fecha);
+            // var numeroAsiento = GetConsecutivo(companyid,t.FechaAsiento.Fecha);
 
             using (MySqlTransaction tr = manejador.GetConnection ().BeginTransaction (IsolationLevel.Serializable)) {
                 try {
                     //si el consecutivo generado no es igual al que tenemos entonces ya alguien mas genero uno
                     //se lanza un excepcion para que el usuario refresque la ventana
-                    if (t.NumeroAsiento != numeroAsiento) {
-                        throw new Exception ("¡Este asiento ya fue asignado por otro usuario, refresque esta ventana!");
-                    }
+                    // if (t.NumeroAsiento != numeroAsiento) {
+                    //     throw new Exception ("¡Este asiento ya fue asignado por otro usuario, refresque esta ventana!");
+                    // }
 
                     var sqlAsiento = "INSERT INTO accounting_entries(entry_id,accounting_months_id,updated_by) " +
                         "VALUES(@entry_id,@accounting_months_id,@updated_by); SELECT LAST_INSERT_ID();";
                     using (MySqlCommand cmd = new MySqlCommand (sqlAsiento, tr.Connection, tr)) {
 
-                        cmd.Parameters.AddWithValue ("@entry_id", t.NumeroAsiento);
-                        cmd.Parameters.AddWithValue ("@accounting_months_id", t.FechaAsiento.Id);
-                        cmd.Parameters.AddWithValue ("@updated_by", user.UsuarioId);
+                        cmd.Parameters.AddWithValue ("@entry_id", asiento.NumeroAsiento);
+                        cmd.Parameters.AddWithValue ("@accounting_months_id", asiento.FechaAsiento.Id);
+                        cmd.Parameters.AddWithValue ("@updated_by", userId);
                         var numeroId = cmd.ExecuteScalar ();
-                        t.Id = Convert.ToInt32 (numeroId);
+                        asiento.Id = Convert.ToInt32 (numeroId);
                     }
 
                     tr.Commit ();
-                    mensaje = "El asiento se guardó correctamente"; ///TODO
-                    return t;
+
+                    return asiento;
                 } catch (Exception) {
                     tr.Rollback ();
                     throw;
@@ -70,14 +60,7 @@ namespace AriesWebApi.Data.Daos {
             }
 
         }
-        /// <summary>
-        /// Lista los asientos por fecha y compañia 
-        /// </summary>
-        /// <param name="fecha"></param>
-        /// <param name="compania"></param>
-        /// <param name="traerInfoCompleta"></param>
-        /// <returns></returns>
-        public List<Asiento> GetPorFecha (string companyid,FechaTransaccion fecha) {
+        public List<Asiento> GetPorFecha (string companyid, FechaTransaccion fecha) {
             List<Asiento> retorno = new List<Asiento> ();
 
             var sql = "SELECT AC.accounting_entry_id, AC.entry_id, AC.created_at, AM.month_report, AC.status+0, AC.convalidated_at, AM.closed FROM accounting_months AS AM " +
@@ -112,7 +95,6 @@ namespace AriesWebApi.Data.Daos {
             }
             return retorno;
         }
-
         public DataTable ListadoAsientosDescuadrados (Compañia compañia, FechaTransaccion fechaTransaccion) {
             var parametros = new List<Parametro> {
                 new Parametro ("@company_id", compañia.Codigo),
@@ -123,23 +105,13 @@ namespace AriesWebApi.Data.Daos {
             return manejador.Listado (sql, parametros, CommandType.Text);
 
         }
-
-        /// <summary>
-        /// con esta función vamos a generar un nuevo consecutivo para los asientos, 
-        /// la idea es que se pueda comparar con el  que tenemos para que los datos 
-        /// sean lo mas exactos posibles. 
-        /// </summary>
-        /// <param name="compania"></param>
-        /// <param name="mesCurso"></param>
-        /// <param name="tr"></param>
-        /// <returns></returns>
-        public int GetConsecutivo (Compañia compania, DateTime mesCurso) {
+        public int GetConsecutivo (string companyId, DateTime mesCurso) {
             var sql = "SELECT AC.entry_id+1 FROM accounting_months AS AM " +
                 "JOIN accounting_entries AS AC ON AM.accounting_months_id = AC.accounting_months_id AND AC.convalidated = false " +
                 "AND MONTH(AM.month_report) = @month_report AND YEAR(AM.month_report) = @year_report AND AM.company_id = @company_id GROUP BY AC.entry_id ORDER BY AC.entry_id DESC LIMIT 1";
             using (MySqlTransaction tr = manejador.GetConnection ().BeginTransaction (IsolationLevel.Serializable)) {
                 using (MySqlCommand cmd = new MySqlCommand (sql, tr.Connection, tr)) {
-                    cmd.Parameters.AddWithValue ("@company_id", compania.Codigo);
+                    cmd.Parameters.AddWithValue ("@company_id", companyId);
                     cmd.Parameters.AddWithValue ("@month_report", mesCurso.Month);
                     cmd.Parameters.AddWithValue ("@year_report", mesCurso.Year);
                     MySqlDataAdapter da = new MySqlDataAdapter {
@@ -158,37 +130,22 @@ namespace AriesWebApi.Data.Daos {
                 }
             }
         }
-        /// <summary>
-        /// Se actualiza 
-        /// </summary>
-        /// <param name="t"></param>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public bool Update (Asiento t, Usuario user, out String mensaje) {
-            if (!Guachi.Consultar (user, VentanaInfo.FormAsientos, CRUDName.Actualizar)) {
-                mensaje = "Acceso denegado!!!";
-                return false;
-            }
+        public void Update (string companyId, double fechaTransaccionId, int userId, Asiento asiento) {
 
             var sqlAsiento = "UPDATE accounting_entries SET updated_by = @updated_by, status = @status WHERE accounting_entry_id = @accounting_entry_id LIMIT 1; ";
             List<Parametro> par = new List<Parametro> ();
-            par.Add (new Parametro ("@updated_by", user.UsuarioId));
-            par.Add (new Parametro ("@status", Convert.ToInt32 (t.Estado)));
-            par.Add (new Parametro ("@accounting_entry_id", t.Id));
+            par.Add (new Parametro ("@updated_by", userId));
+            par.Add (new Parametro ("@status", Convert.ToInt32 (asiento.Estado)));
+            par.Add (new Parametro ("@accounting_entry_id", asiento.Id));
 
             try {
 
-                if (manejador.Ejecutar (sqlAsiento, par, CommandType.Text) > 0) {
-                    mensaje = "asiento actualizado correctamente";
-                    return true;
-                } else {
-                    mensaje = $"El asiento {t.NumeroAsiento} no pudo ser actualizado";
-                    return false;
+                if (manejador.Ejecutar (sqlAsiento, par, CommandType.Text) == 0) {
+                    throw new Exception ("No se pudo actualizar el resgistro");
                 }
 
             } catch (Exception ex) {
-                mensaje = ex.Message;
-                return false;
+                throw ex;
             }
 
         }

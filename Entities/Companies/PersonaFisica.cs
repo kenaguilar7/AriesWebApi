@@ -5,7 +5,7 @@ namespace AriesWebApi.Entities.Companies
 {
     public class PersonaFisica : Compañia
     {
-        public override string tipoCompany {get;set;} = "fisica"; 
+        public override string _tipoCompany { get; set; } = "fisica"; 
         public PersonaFisica()
         {
         }

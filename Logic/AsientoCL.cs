@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using AriesWebApi.Data.Daos;
@@ -15,25 +16,25 @@ namespace AriesWebApi.Logic {
             return asientoDao.GetPorFecha (companyid,fechaTransaccion);
         }
 
-
-
-
-
-
-        public bool Delete (Asiento t, Usuario user, out string mensaje) {
-            ///Llamar al api 
-            ///Leer el Json 
-            ///Deserealizar
-            ///retornar a la capa presentación
-            return asientoDao.Delete (t, user, out mensaje);
-
+        public Asiento GetPreEntry(string companyId,FechaTransaccion dateParams){
+            
+            var asiento = new Asiento();
+            asiento.NumeroAsiento =  asientoDao.GetConsecutivo(companyId,dateParams.Fecha);
+            asiento.FechaAsiento = dateParams;
+            return asiento; 
         }
-        public Asiento Insert (Asiento t, Usuario user, out string mensaje) {
-            return asientoDao.Insert (t, user, out mensaje);
+        public Asiento Insert (string companyId, double fechaTransaccionId,int userId, Asiento asiento) {
+            return asientoDao.Insert (companyId, fechaTransaccionId, userId,asiento);
         }
-        public bool Update (Asiento t, Usuario user, out string mensaje) {
-            return asientoDao.Update (t, user, out mensaje);
+        public void Update (string companyId, double fechaTransaccionId,int userId, Asiento asiento) {
+             asientoDao.Update (companyId, fechaTransaccionId, userId,asiento);
         }
+
+        public void Delete (string companyid, double accountingperiodid,int userId, double asientoid) {
+             asientoDao.Delete (asientoid);
+        }
+        
+        
         public List<Asiento> GetPorFecha (FechaTransaccion fecha, Compañia compania, bool traerInfoCompleta = false, bool traerNuevo = true) {
 
             // List<Asiento> lst = asientoDao.GetPorFecha (fecha, compania, traerInfoCompleta);
