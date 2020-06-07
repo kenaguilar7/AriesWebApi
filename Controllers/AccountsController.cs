@@ -13,18 +13,21 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AriesWebApi.Controllers {
-    [Route ("api/[controller]")]
+
+    [Route ("api/company/{companyid}/[controller]")]
     [ApiController]
     [Produces ("application/json")]
-    public class AccountsController : AuthControllerBase {
+    public class AccountsController : ControllerBase {
         private readonly CuentaCL _cuentaCL = new CuentaCL ();
-        [HttpGet ("{companyid}")]
+        [HttpGet]
         public IActionResult Get (string companyid) => Ok (_cuentaCL.GetAll (companyid));
-        // => Ok (_cuentaCL.GetAll (companyid).Select(x=> new {id = x.Id, nombre = x.Nombre}));
-
+        
         [HttpPost]
         public IActionResult Post ([FromBody] Cuenta cuenta) {
+            
+
             // Todo Save
+            
             return CreatedAtRoute (
                 routeName: "Get",
                 routeValues : new { id = cuenta.Id },
@@ -32,12 +35,16 @@ namespace AriesWebApi.Controllers {
             );
         }
 
-        [HttpPut]
-        public IActionResult Put ([FromBody] Cuenta cuenta) {
+        [HttpPut("{accountid}")]
+        public IActionResult Put (string companyid, double accountid, [FromBody] Cuenta cuenta) {
+            var userId = 1; 
+            _cuentaCL.Update(companyid,cuenta,userId); 
             return Ok ();
         }
-        [HttpDelete]
-        public IActionResult Delete([FromBody] Cuenta cuenta){
+        [HttpDelete ("{accountid}")]
+        public IActionResult Delete(string companyid, double accountid){
+            var userId = 1; 
+            _cuentaCL.Delete(companyid, accountid, userId); 
             return Ok(); 
         }
 
