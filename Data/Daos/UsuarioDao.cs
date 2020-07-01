@@ -31,7 +31,7 @@ namespace AriesWebApi.Data.Daos {
 
             try {
 
-                var newID = manejador.ExecuteAndReturnLastInsertId (sql, lst, CommandType.Text);
+                var newID = manejador.ExecuteAndReturnLastInsertId (sql, lst);
                 userInsert.UsuarioId = newID;
 
                 return userInsert;
@@ -61,7 +61,7 @@ namespace AriesWebApi.Data.Daos {
             lst.Add (new Parametro ("@active", Convert.ToInt16 (user.MyActivo)));
 
             try {
-                return (manejador.Ejecutar (sql, lst, CommandType.Text) == 0) ? true : false;
+                return (manejador.Execute (sql, lst, CommandType.Text) == 0) ? true : false;
             } catch (Exception) {
                 throw new Exception($"No se ejecuto el query: {nameof(Update)}");
             }

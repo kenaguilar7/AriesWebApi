@@ -74,7 +74,7 @@ namespace AriesWebApi.Data.Daos
                     new Parametro("@updated_by", user.UsuarioId)
                     };
 
-                if (manejador.Ejecutar(sql, parametros, CommandType.Text) == 0)
+                if (manejador.Execute(sql, parametros, CommandType.Text) == 0)
                 {
                     mensaje = "No se guardaron datos";
                     return false;

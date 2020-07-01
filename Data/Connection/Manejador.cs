@@ -5,119 +5,121 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 
-namespace AriesWebApi.Data.Connection {
-    public class Manejador {
-        private MySqlConnection databaseConnection = new MySqlConnection (GetConnectionn ());
-        private readonly IConfiguration _configuration;
-        public static string GetConnectionn () {
+namespace AriesWebApi.Data.Connection
+{
+    public class Manejador
+    {
+        private readonly MySqlConnection _databaseConnection = new MySqlConnection(GetConnectionString());
 
-            var builder = new ConfigurationBuilder ()
-                .SetBasePath (Directory.GetCurrentDirectory ())
-                .AddJsonFile ("appsettings.Development.json", optional : true, reloadOnChange : true);
-            IConfiguration configuration = builder.Build ();
+        public static string GetConnectionString()
+        {
+
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+            IConfiguration configuration = builder.Build();
             return configuration["ConnectionStrings:MySqlConnection"];
         }
-        public void OpenConnection () {
 
-            if (databaseConnection.State == ConnectionState.Closed) {
-                databaseConnection.Open ();
+        public void OpenConnection()
+        {
+
+            if (_databaseConnection.State == ConnectionState.Closed)
+            {
+                _databaseConnection.Open();
             }
         }
-        public void CloseConnection () {
-            if (databaseConnection.State == ConnectionState.Open) {
-                databaseConnection.Close ();
+
+        public void CloseConnection()
+        {
+            if (_databaseConnection.State == ConnectionState.Open)
+            {
+                _databaseConnection.Close();
             }
         }
-        public MySqlConnection GetConnection () {
-            OpenConnection ();
-            return databaseConnection;
+
+        public MySqlConnection GetConnection()
+        {
+            OpenConnection();
+            return _databaseConnection;
         }
-        public int Ejecutar (string nombreSp, List<Parametro> lst, CommandType type) {
 
-            using (MySqlTransaction tr = GetConnection ().BeginTransaction (IsolationLevel.Serializable)) {
+        public int Execute(string nombreSp, Parametro parametro)
+            => Execute(nombreSp, new List<Parametro> { parametro}, CommandType.Text); 
 
-                using (MySqlCommand cmd = new MySqlCommand (nombreSp, databaseConnection, tr)) {
+        public int Execute(string nombreSp, List<Parametro> lst, CommandType type)
+        {
 
-                    cmd.CommandType = type;
+            using var connection = new MySqlConnection(GetConnectionString());
+            using var cmd = new MySqlCommand(nombreSp, connection);
+            connection.Open();
 
-                    foreach (var item in lst) {
+            foreach (var item in lst)
+            {
 
-                        if (item.myDireccion == ParameterDirection.Input) {
-                            cmd.Parameters.AddWithValue (item.myNombre, item.myValor);
-                        }
-                        if (item.myDireccion == ParameterDirection.Output) {
-                            cmd.Parameters.Add (item.myNombre, item.myTipoDato, item.myTamanyo).Direction = ParameterDirection.Output;
-                        }
-                    }
-
-                    try {
-                        var retorno = cmd.ExecuteNonQuery ();
-                        tr.Commit ();
-                        return retorno;
-                    } catch (Exception ex) {
-                        tr.Rollback ();
-                        throw ex;
-                    }
+                if (item.myDireccion == ParameterDirection.Input)
+                {
+                    cmd.Parameters.AddWithValue(item.myNombre, item.myValor);
+                }
+                if (item.myDireccion == ParameterDirection.Output)
+                {
+                    cmd.Parameters.Add(item.myNombre, item.myTipoDato, item.myTamanyo).Direction = ParameterDirection.Output;
                 }
             }
+
+            var retorno = cmd.ExecuteNonQuery();
+            return retorno;
         }
-        public long ExecuteAndReturnLastInsertId (string nombreSp, List<Parametro> lst, CommandType type) {
 
-            using (MySqlTransaction tr = GetConnection ().BeginTransaction (IsolationLevel.Serializable)) {
+        public long ExecuteAndReturnLastInsertId(string nombreSp, List<Parametro> lst)
+        {
+            using MySqlConnection connection = new MySqlConnection(GetConnectionString());
+            using MySqlCommand cmd = new MySqlCommand(nombreSp, connection);
+            connection.Open(); 
 
-                using (MySqlCommand cmd = new MySqlCommand (nombreSp, databaseConnection, tr)) {
-
-                    cmd.CommandType = type;
-
-                    foreach (var item in lst) {
-
-                        if (item.myDireccion == ParameterDirection.Input) {
-                            cmd.Parameters.AddWithValue (item.myNombre, item.myValor);
-                        }
-                        if (item.myDireccion == ParameterDirection.Output) {
-                            cmd.Parameters.Add (item.myNombre, item.myTipoDato, item.myTamanyo).Direction = ParameterDirection.Output;
-                        }
-                    }
-
-                    try {
-                        cmd.ExecuteNonQuery();
-                        var retorno = cmd.LastInsertedId; 
-                        tr.Commit ();
-                        return retorno;
-                    } catch (Exception ex) {
-                        tr.Rollback ();
-                        throw ex;
-                    }
+            foreach (var item in lst)
+            {
+                if (item.myDireccion == ParameterDirection.Input)
+                {
+                    cmd.Parameters.AddWithValue(item.myNombre, item.myValor);
                 }
             }
-        }
-        public DataTable Listado (String nombreSp, List<Parametro> lst, CommandType type) {
-            DataTable dt = new DataTable ();
-            MySqlDataAdapter da;
-            try {
-                da = new MySqlDataAdapter (nombreSp, GetConnection ());
-                da.SelectCommand.CommandType = type;
-                if (lst != null) {
-                    for (int i = 0; i < lst.Count; i++) {
-                        da.SelectCommand.Parameters.AddWithValue (lst[i].myNombre, lst[i].myValor);
 
-                    }
+            cmd.ExecuteNonQuery();
+            var retorno = cmd.LastInsertedId;
+            return retorno;
+        }
+
+        public DataTable Listado(String nombreSp, List<Parametro> lst, CommandType type)
+        {
+
+            var dtRetorno = new DataTable();
+            using (MySqlConnection connect = new MySqlConnection(GetConnectionString()))
+            using (var sqlDataAdapter = new MySqlDataAdapter(nombreSp, connect))
+            {
+                connect.Open();
+                foreach (var param in lst)
+                {
+                    sqlDataAdapter.SelectCommand.Parameters.AddWithValue(param.myNombre, param.myValor);
                 }
-
-                da.Fill (dt);
-
-            } catch (Exception ex) {
-                throw ex;
+                sqlDataAdapter.Fill(dtRetorno);
             }
-            return dt;
+
+            return dtRetorno;
         }
-        public DataTable Listado (String nombreSp, CommandType type) {
-            return Listado (nombreSp, new List<Parametro> (), type);
+
+        public DataTable Listado(String nombreSp, CommandType type)
+        {
+            return Listado(nombreSp, new List<Parametro>(), type);
         }
-        public DataTable Listado (String nombreSp, Parametro parametro, CommandType type) {
-            var par = new List<Parametro> ();
-            par.Add (parametro);
-            return Listado (nombreSp, par, type);
+
+        public DataTable Listado(String nombreSp, Parametro parametro, CommandType type)
+        {
+            var par = new List<Parametro>
+            {
+                parametro
+            };
+            return Listado(nombreSp, par, type);
         }
     }
 }

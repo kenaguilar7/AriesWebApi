@@ -9,18 +9,13 @@ namespace AriesWebApi.Entities.Accounts
         public Comportamiento Comportamiento { get { return Comportamiento.Credito; } }
         public decimal SaldoActual(decimal saldo, decimal debito, decimal credito)
         {
-            return (saldo - debito + credito);
+            return (saldo + credito - debito);
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="debito"></param>
-        /// <param name="credito"></param>
-        /// <returns></returns>
+        
         public decimal SaldoMensual(decimal debito, decimal credito)
         {
                 /// credito - debito
-            return (debito + credito);
+            return (credito - debito);
         }
     }
 }

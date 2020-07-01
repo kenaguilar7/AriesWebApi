@@ -5,34 +5,39 @@ using AriesWebApi.Entities.Companies;
 using AriesWebApi.Entities.Users;
 using AriesWebApi.Entities.Verifications;
 
-namespace AriesWebApi.Logic {
-    public class CompañiaCL {
-        private readonly CompañiaDao _companyDao = new CompañiaDao ();
+namespace AriesWebApi.Logic
+{
+    public class CompañiaCL
+    {
 
-        public IEnumerable<Compañia> Get () {
-            var user = new Usuario () {
+        private readonly CompañiaDao _companyDao = new CompañiaDao();
+
+        public IEnumerable<Compañia> Get()
+        {
+            var user = new Usuario()
+            {
                 UsuarioId = 1
             };
-            return _companyDao.GetAll (user);
+            return _companyDao.GetAll(user);
         }
-        public Compañia Insert (Compañia company, Usuario user, string copyDataFrom) => _companyDao.Insert (company, copyDataFrom, user);
 
-        public void Update (Compañia company, Usuario user) {
+        public Compañia Insert(Compañia company, Usuario user, string copyDataFrom)
+            => _companyDao.Insert(company, copyDataFrom, user);
 
-            _companyDao.Update (company, user);
+        public void Update(Compañia company, Usuario user)
+        {
+            _companyDao.Update(company, user);
 
         }
-        public string NuevoCodigo () {
-            return _companyDao.NuevoCodigo ();
+
+        public string NuevoCodigo()
+        {
+            return _companyDao.NuevoCodigo();
         }
-        /// <summary>
-        /// Devuleve la lista con todas las compañias, Esta lista trae en 
-        /// las primeras posiciones las personas fisicas y despues las juridicas 
-        /// puede ordenarlas. 
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<Compañia> GetAll (Usuario usuario) {
-            return _companyDao.GetAll (usuario);
+
+        public IEnumerable<Compañia> GetAll(Usuario usuario)
+        {
+            return _companyDao.GetAll(usuario);
         }
     }
 }

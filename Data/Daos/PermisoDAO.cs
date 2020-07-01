@@ -30,7 +30,7 @@ namespace AriesWebApi.Data.Daos
                     new Parametro("@updated_by", usuario.UsuarioId)
                 };
 
-                contador = (manejador.Ejecutar(sql, parametros, CommandType.Text) == 1) ? contador - 1 : contador;
+                contador = (manejador.Execute(sql, parametros, CommandType.Text) == 1) ? contador - 1 : contador;
 
             }
             return (contador == 0) ? true : false;
@@ -99,7 +99,7 @@ namespace AriesWebApi.Data.Daos
                     new Parametro("@updated_by", usuario.UsuarioId)
                 };
 
-                contador = (manejador.Ejecutar(sql, parametros, CommandType.Text) == 1) ? contador-- : contador;
+                contador = (manejador.Execute(sql, parametros, CommandType.Text) == 1) ? contador-- : contador;
 
             }
             return (contador == 0) ? true : false;

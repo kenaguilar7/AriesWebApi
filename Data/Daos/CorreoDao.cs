@@ -34,7 +34,7 @@ namespace AriesWebApi.Data.Daos
             };
             try
             {
-                var resl = manejador.Ejecutar(sql, parametros, CommandType.Text);
+                var resl = manejador.Execute(sql, parametros, CommandType.Text);
 
                 return (resl == 0) ? false : true;
             }

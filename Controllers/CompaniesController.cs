@@ -48,7 +48,7 @@ namespace AriesWebApi.Controllers {
                 value : company);
         }
 
-        [HttpPut (Name = "put")]
+        [HttpPut (Name = "Put")]
         public IActionResult Put ([FromBody] Compañia compania) {
 
             Usuario user = new Usuario (){UsuarioId=1};

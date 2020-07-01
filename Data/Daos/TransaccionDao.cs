@@ -74,7 +74,7 @@ namespace AriesWebApi.Data.Daos {
             };
 
             try {
-                var affectedRows = manejador.Ejecutar (sql, lst, CommandType.Text);
+                var affectedRows = manejador.Execute (sql, lst, CommandType.Text);
                 if (affectedRows == 0) { throw new Exception ("No se actualizo ningun registro"); }
             } catch (Exception ex) {
                 throw ex;
