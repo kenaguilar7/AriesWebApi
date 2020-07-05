@@ -45,6 +45,7 @@ namespace AriesWebApi.Controllers
         {
             var validator = new CuentaValidator();
             var result = validator.Validate(cuenta, ruleSet:"Insert");
+
             if (result.IsValid)
             {
                 var userId = 1;//TODO 
@@ -56,8 +57,9 @@ namespace AriesWebApi.Controllers
                     value: newCuenta
                 );
             }
-            else {
-                return BadRequest(result.Errors);             
+            else
+            {
+                return BadRequest(result.Errors);
             }
 
         }
@@ -65,10 +67,20 @@ namespace AriesWebApi.Controllers
         [HttpPut("{accountid}")]
         public IActionResult Put(string companyid, double accountid, Cuenta cuenta)
         {
+            var validator = new CuentaValidator();
+            var result = validator.Validate(cuenta, ruleSet: "Update");
 
-            var userId = 1;
-            _cuentaCL.Update(companyid, cuenta, userId);
-            return Ok();
+            if (result.IsValid)
+            {
+                var userId = 1;
+                _cuentaCL.Update(companyid, cuenta, userId);
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(result.Errors);
+            }
+
         }
 
         [HttpDelete("{accountid}")]

@@ -13,22 +13,31 @@ namespace AriesWebApi.Entities.Accounts.AccountList
 
         public static IEnumerable<Cuenta> GetLowLevelAccounts(this IEnumerable<Cuenta> cuentas, double accountId)
         {
-            List<Cuenta> retorno = new List<Cuenta>();
-            var lstaccounts = cuentas.Where(x => x.Padre == accountId || x.Id == accountId);
 
-            retorno.AddRange(lstaccounts);
-
-            foreach (Cuenta cuenta in lstaccounts)
+            List<Cuenta> retorno = GetListWithMainAccount(cuentas, accountId);
+            List<Cuenta> auxList1 = retorno;
+            List<Cuenta> auxList2 = new List<Cuenta>();
+            
+            do
             {
-                if (cuenta.Id != accountId)
+                foreach (Cuenta cuenta in auxList1)
                 {
-                    var lowLevelOfAccountList = cuentas.Where(x => x.Padre == cuenta.Id);
-                    retorno.AddRange(GetLowLevelAccounts(lowLevelOfAccountList, cuenta.Id));
+                    auxList2.AddRange(GetAllChildAccounts(cuentas, cuenta));
                 }
-            }
+                retorno.AddRange(auxList2);
+                auxList1 = auxList2.ToList();
+                auxList2.Clear();
 
+            } while (auxList1.Count() != 0);
+            
             return retorno;
         }
+
+        private static IEnumerable<Cuenta> GetAllChildAccounts(IEnumerable<Cuenta> cuentas, Cuenta cuenta)
+            => cuentas.Where(cnt => cnt.Padre == cuenta.Id);
+
+        private static List<Cuenta> GetListWithMainAccount(IEnumerable<Cuenta> cuentas, double accountId)
+            => new List<Cuenta> { cuentas.FirstOrDefault(cuenta => cuenta.Id == accountId) };
 
         public static IEnumerable<Cuenta> GetHightLevelAccounts(this IEnumerable<Cuenta> cuentas, double accountId)
         {
@@ -57,13 +66,13 @@ namespace AriesWebApi.Entities.Accounts.AccountList
 
             foreach (Cuenta lowCuenta in lstLowerLevel)
             {
-                GetAndSumAllAccountsFromLowerToHigherLevel(ref cuentas, lowCuenta);
+                GetAndSumAllAccountsFromLowerToHigherLevel(cuentas, lowCuenta);
             }
 
             return cuentas;
         }
 
-        private static void GetAndSumAllAccountsFromLowerToHigherLevel(ref IEnumerable<Cuenta> cuentas,
+        private static void GetAndSumAllAccountsFromLowerToHigherLevel(IEnumerable<Cuenta> cuentas,
                                                                                       Cuenta cuentaConSaldo)
         {
             Cuenta cuentaAux = cuentaConSaldo;
@@ -76,9 +85,8 @@ namespace AriesWebApi.Entities.Accounts.AccountList
                     SumBalance(cuentaConSaldo, cuentaAux);
 
             } while (cuentaAux != null);
-        
-        }
 
+        }
         private static void SumBalance(Cuenta cuentaSumFrom, Cuenta cuentaSumTo)
         {
             cuentaSumTo.DebitosColones += cuentaSumFrom.DebitosColones;
