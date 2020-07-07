@@ -54,76 +54,22 @@ namespace AriesWebApi.Data.Daos
             return manejador.Listado(sql, new Parametro("@company_id", companyid), CommandType.Text);
 
         }
-        public bool Insert(FechaTransaccion t, Compañia compañia, Usuario user, out String mensaje)
+        public FechaTransaccion Insert(string companyId, int userId, FechaTransaccion fechaTransaccion)
         {
+            var sql = "INSERT INTO accounting_months(month_report,company_id,updated_by) VALUES(@month_report,@company_id,@updated_by);";
 
-            // if (!Guachi.Consultar(user, VentanaInfo.FormAdminMeses, CRUDName.Insertar))
-            // {
-            //     mensaje = "Acceso denegado!!!";
-            //     return false;
-            // }
+            var parametros = new List<Parametro>() {
+                    new Parametro("@month_report", fechaTransaccion.Fecha),
+                    new Parametro("@company_id", companyId),
+                    new Parametro("@updated_by", userId)
+                };
 
-            try
-            {
-
-                var sql = "INSERT INTO accounting_months(month_report,company_id,updated_by) VALUES(@month_report,@company_id,@updated_by);";
-
-                var parametros = new List<Parametro>() {
-                    new Parametro("@month_report", t.Fecha),
-                    new Parametro("@company_id", compañia.Codigo),
-                    new Parametro("@updated_by", user.UsuarioId)
-                    };
-
-                if (manejador.Execute(sql, parametros, CommandType.Text) == 0)
-                {
-                    mensaje = "No se guardaron datos";
-                    return false;
-                }
-                else
-                {
-                    mensaje = "Datos guardados correctamente";
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                mensaje = ex.Message;
-                return false;
-            }
-
+            fechaTransaccion.Id = manejador.ExecuteAndReturnLastInsertId(sql, parametros);
+            return fechaTransaccion;
         }
-        /// <summary>
-        /// Se hace todo en un metodo porque debemos de asegurarnos que el mes quede cerrado y los datos quedeb tambien guardados
-        /// primero se intenta cerrar el mes 
-        /// 
-        /// </summary>
-        /// <param name="t"></param>
-        /// <param name="compañia"></param>
-        /// <param name="user"></param>
-        /// <param name="lstCuentas"></param>
-        /// <param name="mensaje"></param>
-        /// <returns></returns>
+
         public bool CerrarMes(FechaTransaccion t, Compañia compañia, Usuario user, List<Cuenta> lstCuentas, out String mensaje)
         {
-
-            /**
-             * Primero se consulta si el usuario tiene permisos para hacer la accción
-             * 
-             */
-
-            if (!Guachi.Consultar(user, VentanaInfo.FormAsientos, CRUDName.Actualizar))
-            {
-                mensaje = "Acceso denegado!!!";
-                return false;
-            }
-
-
-            /**
-             * Se abre una transacción que sera la encargada de insertar los datos 
-             * 
-             * primero cerramos el mes y nos aseguramos que de verdad se haya cerrado
-             */
-
             using (MySqlTransaction tr = manejador.GetConnection().BeginTransaction(IsolationLevel.Serializable))
             {
                 try

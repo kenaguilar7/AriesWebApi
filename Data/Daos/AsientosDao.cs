@@ -9,6 +9,7 @@ using AriesWebApi.Entities.security;
 using AriesWebApi.Entities.TransactionsDates;
 using AriesWebApi.Entities.Users;
 using MySql.Data.MySqlClient;
+using System.Linq;
 
 namespace AriesWebApi.Data.Daos
 {
@@ -50,11 +51,11 @@ namespace AriesWebApi.Data.Daos
             try
             {
                 var parametros = new List<Parametro>() {
-                new Parametro("@entry_id", asiento.NumeroAsiento), 
-                new Parametro("@accounting_months_id", asiento.FechaAsiento.Id), 
+                new Parametro("@entry_id", asiento.NumeroAsiento),
+                new Parametro("@accounting_months_id", asiento.FechaAsiento.Id),
                 new Parametro("@updated_by", userId),
-                }; 
-                
+                };
+
                 asiento.Id = (int)manejador.ExecuteAndReturnLastInsertId(sqlAsiento, parametros);
 
 
@@ -70,43 +71,43 @@ namespace AriesWebApi.Data.Daos
 
 
         }
-        public List<Asiento> GetPorFecha(string companyid, FechaTransaccion fecha)
+        public IEnumerable<Asiento> GetAll(double fechaTransaccionId)
         {
-            List<Asiento> retorno = new List<Asiento>();
+            var sql = "SELECT T1.accounting_entry_id,  " +
+            "T1.entry_id,  " +
+            "T1.created_at,  " +
+            "T0.month_report,  " +
+            "T1.status + 0,  " +
+            "T1.convalidated_at  " +
+            "FROM accounting_months T0 JOIN accounting_entries T1 " +
+            "ON T0.accounting_months_id = T1.accounting_months_id " +
+            "WHERE T0.closed = false AND T1.convalidated = false " +
+            "AND T0.accounting_months_id = @accounting_months_id " +
+            "AND T0.active = true AND T1.active = true " +
+            "GROUP BY T1.entry_id ORDER BY T1.entry_id DESC ";
 
-            var sql = "SELECT AC.accounting_entry_id, AC.entry_id, AC.created_at, AM.month_report, AC.status+0, AC.convalidated_at, AM.closed FROM accounting_months AS AM " +
-                "JOIN accounting_entries AS AC ON AM.accounting_months_id = AC.accounting_months_id AND AM.closed = false AND AC.convalidated = false AND AM.active = true AND AC.active = true " +
-                "AND MONTH(AM.month_report) = @month_report AND YEAR(AM.month_report) = @year_report AND AM.company_id = @company_id GROUP BY AC.entry_id ORDER BY AC.entry_id DESC";
+            var param = new Parametro("@accounting_months_id", fechaTransaccionId);
+            DataTable datatable = manejador.Listado(sql, param, CommandType.Text);
 
-            DataTable dt = manejador.Listado(sql,
-                new List<Parametro> {
-                    new Parametro ("@month_report", fecha.Fecha.Month),
-                    new Parametro ("@year_report", fecha.Fecha.Year),
-                    new Parametro ("@company_id", companyid)
-                },
-                CommandType.Text
-            );
-
-            foreach (DataRow item in dt.Rows)
-            {
-
-                Object[] vs = item.ItemArray;
-                var asiento = new Asiento();
-                asiento.Id = Convert.ToInt32(vs[0]);
-                asiento.NumeroAsiento = Convert.ToInt32(vs[1]);
-                asiento.FechaRegistro = Convert.ToDateTime(vs[2]);
-                asiento.FechaAsiento = new FechaTransaccion(fecha: Convert.ToDateTime(vs[3])); //agregar el resto de parametros
-                //asiento.Convalidado = Convert.ToBoolean();
-                asiento.Estado = (EstadoAsiento)Convert.ToInt32(vs[4]);
-                // asiento.Compania = compania;
-                asiento.FechaAsiento = fecha;
-                // if (traerInfoCompleta) {
-                //     asiento.Transaccions = new TransaccionDao ().GetCompleto (asiento);
-                // }
-                retorno.Add(asiento);
-            }
-            return retorno;
+            return ConvertDataTableToList(datatable);
         }
+
+        private static IEnumerable<Asiento> ConvertDataTableToList(DataTable datatable)
+        {
+            return from DataRow item in datatable.Rows
+                    let vs = item.ItemArray
+                    let asiento = new Asiento
+                    {
+                        Id = Convert.ToInt32(vs[0]),
+                        NumeroAsiento = Convert.ToInt32(vs[1]),
+                        FechaRegistro = Convert.ToDateTime(vs[2]),
+                        FechaAsiento = new FechaTransaccion(fecha: Convert.ToDateTime(vs[3])),
+                        Estado = (EstadoAsiento)Convert.ToInt32(vs[4]),
+                        //FechaConvalidacion = Convert.ToDateTime(vs[5]),
+                    }
+                    select asiento;
+        }
+
         public DataTable ListadoAsientosDescuadrados(Compañia compañia, FechaTransaccion fechaTransaccion)
         {
             var parametros = new List<Parametro> {

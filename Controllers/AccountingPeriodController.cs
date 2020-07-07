@@ -49,20 +49,23 @@ namespace AriesWebApi.Controllers
         [HttpPost]
         public IActionResult Post(string companyid, [FromBody] FechaTransaccion fechaTransaccion)
         {
+            var userId = 1; 
+            var newEntity = _fechaTransaccionCL.Insert(companyid, userId, fechaTransaccion); 
+
             fechaTransaccion.Id = 67;
             return CreatedAtRoute(
                 routeName: "Get",
-                routeValues: new { id = fechaTransaccion.Id, companyid = companyid },
-                value: fechaTransaccion);
+                routeValues: new { id = newEntity.Id, companyid = companyid },
+                value: newEntity);
 
         }
 
-        [HttpPut(Name = "CloseMonth")]
-        public IActionResult CloseMonth(string companyid, [FromBody] FechaTransaccion fechaTransaccion)
-        {
+        //[HttpPut(Name = "CloseMonth")]
+        //public IActionResult CloseMonth(string companyid, [FromBody] FechaTransaccion fechaTransaccion)
+        //{
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
 
 
 
