@@ -36,46 +36,5 @@ namespace AriesWebApi.Logic {
              asientoDao.Delete (asientoid);
         }
         
-        
-        public List<Asiento> GetPorFecha (FechaTransaccion fecha, Compañia compania, bool traerInfoCompleta = false, bool traerNuevo = true) {
-
-            // List<Asiento> lst = asientoDao.GetPorFecha (fecha, compania, traerInfoCompleta);
-
-            // //esto lo unico que hace es generar un nuevo asiento para que se posicione de primer lugar la lista
-            // if (traerNuevo) {
-            //     var dummy = new Asiento (
-            //         numeroAsiento: asientoDao.GetConsecutivo (compania, fecha.Fecha),
-            //         compania : compania
-            //     ) {
-            //         FechaAsiento = fecha
-            //     };
-
-            //     lst.Insert (0, dummy);
-            // }
-
-            return null;
-
-        }
-
-        public List<Asiento> GetMesesPendientes (FechaTransaccion fecha,
-            Compañia compania) {
-
-            var dummy = new List<Asiento> ();
-
-            foreach (var item in GetPorFecha (fecha, compania, traerInfoCompleta : true)) {
-                if (item.Estado == EstadoAsiento.Proceso) {
-                    dummy.Add (item);
-                }
-            }
-
-            return dummy;
-
-        }
-        public DataTable ReporteAsientos (Compañia compañia, FechaTransaccion fecha, bool traerTodos) {
-            return asientoDao.ReporteAsientos (compañia, fecha, traerTodos);
-        }
-        public DataTable ListadoAsientosDescuadrados (Compañia compañia, FechaTransaccion fechaTransaccion) {
-            return asientoDao.ListadoAsientosDescuadrados (compañia, fechaTransaccion);
-        }
     }
 }

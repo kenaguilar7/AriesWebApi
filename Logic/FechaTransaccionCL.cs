@@ -4,6 +4,9 @@ using System.Reflection.Metadata.Ecma335;
 using AriesWebApi.Data.Daos;
 using AriesWebApi.Entities.TransactionsDates;
 using System.Linq;
+using AriesWebApi.Entities.TransactionsDates.TransactionDateList;
+using AriesWebApi.Entities.Accounts;
+using System;
 
 namespace AriesWebApi.Logic
 {
@@ -13,34 +16,61 @@ namespace AriesWebApi.Logic
 
         public IEnumerable<FechaTransaccion> GetAll(string companyid) => FechaDao.GetAll(companyid);
 
-        public DataTable GetDataTable(string companyId) => FechaDao.GetDataTable(companyId);
-
         public FechaTransaccion Insert(string companyId, int userId, FechaTransaccion fechaTransaccion)
         {
             return FechaDao.Insert(companyId, userId, fechaTransaccion);
         }
 
-        public IEnumerable<FechaTransaccion> BuildNewFechaTransaccionList(string companyId, IEnumerable<FechaTransaccion> fechaTransaccions)
+        public DataTable GetDataTable(string companyId) => FechaDao.GetDataTable(companyId);
+
+        public IEnumerable<FechaTransaccion> GetAvailablePostingPeriodsForBeCreated(string companyId)
         {
-            var _cuentaCL = new CuentaCL();
-            //var ultimaFecha = (from c in fechaTransaccions orderby c.Fecha ascending select c).FirstOrDefault();
-            fechaTransaccions.OrderBy(x => x.Fecha);
+            var postingPeriods = GetAll(companyId);
 
-            var ultimaFecha = fechaTransaccions.LastOrDefault();
-            var primerFecha = fechaTransaccions.FirstOrDefault();
-            var lst = _cuentaCL.CuentaConSaldos(companyId, primerFecha.Id, ultimaFecha.Id);
-            var hasSaldo = lst.FirstOrDefault(cuenta => cuenta.CuentaConMovientos());
-
-            if (hasSaldo == null)
+            if (postingPeriods.Count() > 0)
             {
-                var proximo = (from c in fechaTransaccions orderby c.Fecha descending select new FechaTransaccion(fecha: c.Fecha.AddMonths(1))).FirstOrDefault();
-                var ultimo = (from c in fechaTransaccions orderby c.Fecha ascending select new FechaTransaccion(fecha: c.Fecha.AddMonths(-1))).FirstOrDefault();
-                return new FechaTransaccion[] { ultimo, proximo };
+                return CreateAvailablePostingPeriodsForBeCreate(companyId, postingPeriods);
             }
             else
             {
-                return new FechaTransaccion[] { (from c in fechaTransaccions orderby c.Fecha descending select new FechaTransaccion(fecha: c.Fecha.AddMonths(1))).FirstOrDefault() };
+                return CreatePreEntity(DateTime.Now);
             }
         }
+
+        private IEnumerable<FechaTransaccion> CreateAvailablePostingPeriodsForBeCreate(string companyId, IEnumerable<FechaTransaccion> postingPeriods)
+        {
+
+            if (HasJournalEntries(companyId, postingPeriods))
+            {
+                return CreatePreEntity(postingPeriods.GetNewerDate().Fecha.AddMonths(1));
+            }
+            else
+            {
+                return CreatePreEntity(postingPeriods.GetOlderDate().Fecha.AddMonths(-1),
+                              postingPeriods.GetNewerDate().Fecha.AddMonths(1));
+            }
+        }
+
+        private bool HasJournalEntries(string companyId, IEnumerable<FechaTransaccion> postingPeriods)
+        {
+            CuentaCL _cuentaCL = new CuentaCL();
+            var accounts = _cuentaCL.CuentaConSaldos(companyId,
+                                                     postingPeriods.GetOlderDate().Id,
+                                                     postingPeriods.GetNewerDate().Id);
+
+            return accounts.Count(row => row.CuentaConMovientos()) > 0;
+        }
+
+        private IEnumerable<FechaTransaccion> CreatePreEntity(DateTime fromDatePeriod)
+        {
+            return new List<FechaTransaccion>() { FechaDao.CreatePreEntity(fromDatePeriod) };
+        }
+
+        private IEnumerable<FechaTransaccion> CreatePreEntity(DateTime fromDatePeriod, DateTime toDatePeriod)
+        {
+            return new List<FechaTransaccion>() { FechaDao.CreatePreEntity(fromDatePeriod), 
+                                                  FechaDao.CreatePreEntity(toDatePeriod) };
+        }
+
     }
 }

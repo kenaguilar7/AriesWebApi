@@ -32,24 +32,24 @@ namespace AriesWebApi.Logic
         }
 
         public Cuenta CuentaConSaldos(string companyId, double accountId,
-                                      double startMonthId, double endMonthId)
+                                      double fromAccountPeriodId, double toAccountPeriodId)
         {
             IEnumerable<Cuenta> accounts = GetAll(companyId).GetLowLevelAccounts(accountId);
-            BuildBalanceAccount(companyId, startMonthId, endMonthId, accounts);
+            BuildBalanceAccount(companyId, fromAccountPeriodId, toAccountPeriodId, accounts);
             return accounts.First(row => row.Id == accountId);
         }
 
-        public IEnumerable<Cuenta> CuentaConSaldos(string companyId, double startMonthId,
-                                                   double endMonthId)
+        public IEnumerable<Cuenta> CuentaConSaldos(string companyId, double fromAccountPeriodId,
+                                                   double toAccountPeriodId)
         {
             var accounts = GetAll(companyId);
-            return BuildBalanceAccount(companyId, startMonthId, endMonthId, accounts);
+            return BuildBalanceAccount(companyId, fromAccountPeriodId, toAccountPeriodId, accounts);
         }
 
-        private IEnumerable<Cuenta> BuildBalanceAccount(string companyid, double startMonthId,
-                                                        double endMonthId, IEnumerable<Cuenta> lstCuentas)
+        private IEnumerable<Cuenta> BuildBalanceAccount(string companyid, double fromAccountPeriodId,
+                                                        double toAccountPeriodId, IEnumerable<Cuenta> lstCuentas)
         {
-            var TableWithAllAccountsBalance = _cuentadao.CuentasConSaldos(companyid, startMonthId, endMonthId);
+            var TableWithAllAccountsBalance = _cuentadao.CuentasConSaldos(companyid, fromAccountPeriodId, toAccountPeriodId);
             FillAuxiliarsAccountsWithBalance(lstCuentas, TableWithAllAccountsBalance);
             return lstCuentas.BuildAccountsBalance();
         }

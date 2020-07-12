@@ -26,31 +26,14 @@ namespace AriesWebApi.Controllers
         [HttpGet("GetAvailableMonths")]
         public IActionResult GetAvailableMonths(string companyid)
         {
-
-            var fechaTransaccions = _fechaTransaccionCL.GetAll(companyid);
-            //No hay meses abiertos
-            if (fechaTransaccions.FirstOrDefault() == null)
-            {
-                return Ok(new List<FechaTransaccion>() {
-                    new FechaTransaccion (
-                        id: 0,
-                        fecha: DateTime.Today,
-                        cerrada: false
-                    )
-                });
-            }
-            else
-            {
-                return Ok(_fechaTransaccionCL.BuildNewFechaTransaccionList(companyid,fechaTransaccions));
-            }
-
+            return Ok(_fechaTransaccionCL.GetAvailablePostingPeriodsForBeCreated(companyid));
         }
 
         [HttpPost]
         public IActionResult Post(string companyid, [FromBody] FechaTransaccion fechaTransaccion)
         {
-            var userId = 1; 
-            var newEntity = _fechaTransaccionCL.Insert(companyid, userId, fechaTransaccion); 
+            var userId = 1;
+            var newEntity = _fechaTransaccionCL.Insert(companyid, userId, fechaTransaccion);
 
             fechaTransaccion.Id = 67;
             return CreatedAtRoute(

@@ -335,7 +335,7 @@ namespace AriesWebApi.Data.Daos
 
         }
 
-        public DataTable CuentasConSaldos(string companyId, double startDateId, double endMonthId, double accountId = 0.0)
+        public DataTable CuentasConSaldos(string companyId, double fromAccountPeriodId, double toAccountPeriodId, double accountId = 0.0)
         {
             var sql2 = "SET @startdate = (SELECT month_report FROM accounting_months WHERE accounting_months_id = @startdateid); " +
                         "SET @enddate = (SELECT month_report FROM accounting_months WHERE accounting_months_id = @enddateid); " +
@@ -349,8 +349,8 @@ namespace AriesWebApi.Data.Daos
             
             var parametros = new List<Parametro>() {
                 new Parametro ("@company_id", companyId),
-                new Parametro ("@startdateid",startDateId),
-                new Parametro ("@enddateid",endMonthId),
+                new Parametro ("@startdateid",fromAccountPeriodId),
+                new Parametro ("@enddateid",toAccountPeriodId),
                 new Parametro ("@account_id", accountId)
             };
 

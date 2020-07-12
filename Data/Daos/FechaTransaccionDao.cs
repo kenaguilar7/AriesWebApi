@@ -4,8 +4,6 @@ using System.Data;
 using AriesWebApi.Data.Connection;
 using AriesWebApi.Entities.Accounts;
 using AriesWebApi.Entities.Companies;
-using AriesWebApi.Entities.Enums;
-using AriesWebApi.Entities.security;
 using AriesWebApi.Entities.TransactionsDates;
 using AriesWebApi.Entities.Users;
 using MySql.Data.MySqlClient;
@@ -15,6 +13,9 @@ namespace AriesWebApi.Data.Daos
     public class FechaTransaccionDao
     {
         private readonly Manejador manejador = new Manejador();
+
+        public FechaTransaccion CreatePreEntity(DateTime PeriodDate)
+            => new FechaTransaccion() { Fecha = PeriodDate };
 
         public List<FechaTransaccion> GetAll(string companyid)
         {
@@ -41,6 +42,7 @@ namespace AriesWebApi.Data.Daos
                 throw;
             }
         }
+       
         public DataTable GetDataTable(string companyid)
         {
             var sql = "SET lc_time_names = 'es_ES';" +

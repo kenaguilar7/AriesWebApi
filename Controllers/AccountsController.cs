@@ -35,9 +35,9 @@ namespace AriesWebApi.Controllers
             => Ok(_cuentaCL.GetAll(companyid).FirstOrDefault(x => x.Id == accountId));
 
         [HttpGet("GetFullBalanceWithDateRange/{accountId}")]
-        public IActionResult GetFullBalanceWithDateRange(string companyid, double accountId, double startmonthid, double endmonthid)
+        public IActionResult GetFullBalanceWithDateRange(string companyid, double accountId, double fromAccountPeriodId, double toAccountPeriodId)
         {
-            return Ok(_cuentaCL.CuentaConSaldos(companyid, accountId, startmonthid, endmonthid));
+            return Ok(_cuentaCL.CuentaConSaldos(companyid, accountId, fromAccountPeriodId, toAccountPeriodId));
         }
 
         [HttpPost]
