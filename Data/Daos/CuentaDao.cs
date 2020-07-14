@@ -337,13 +337,12 @@ namespace AriesWebApi.Data.Daos
 
         public DataTable CuentasConSaldos(string companyId, double fromAccountPeriodId, double toAccountPeriodId, double accountId = 0.0)
         {
-            var sql2 = "SET @startdate = (SELECT month_report FROM accounting_months WHERE accounting_months_id = @startdateid); " +
+            var sql2 =  "SET @startdate = (SELECT month_report FROM accounting_months WHERE accounting_months_id = @startdateid); " +
                         "SET @enddate = (SELECT month_report FROM accounting_months WHERE accounting_months_id = @enddateid); " +
                         "SELECT account_id, cuadrado, SUM(debito), SUM(credito), SUM(debito_USD), SUM(credito_USD) " +
                         "FROM account_info T0 " +
                         "WHERE company_id = @company_id " +
-                        "AND (T0.year between YEAR(@startdate) and YEAR(@enddate) " +
-                        "AND T0.month BETWEEN MONTH(@startdate) AND MONTH(@enddate)) " +
+                        "AND T0.posting_date between date_format(@startdate,'%Y%m') and date_format(@enddate,'%Y%m') " +
                         "AND(account_id = @account_id or @account_id = 0) " +
                         "GROUP BY account_id ";
             
